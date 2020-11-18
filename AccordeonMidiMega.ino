@@ -44,7 +44,8 @@ void setup() {
 
   lcd.init();                      // initialize the lcd
   lcd.backlight();
-  delay(500);                      //Est-ce utile ?
+  lcd.println("Mega_20201118-02"); //Affiche la version
+  delay(2000);                     
 
   // initialisation pin digital du tableau de Touches Mélodie en INPUT_PULLUP
   for (int i = 0; i < Nb_ToucheMelodie; i++) {

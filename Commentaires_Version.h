@@ -1,3 +1,6 @@
+Version Mega_20201118-02
+Affiche version au démarrage
+
 Version Mega_20201118-01
 
 Correction Gestion Codeur Octave pour les basses
