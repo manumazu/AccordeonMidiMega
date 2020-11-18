@@ -1,3 +1,8 @@
+Version Mega_20201118-01
+
+Correction Gestion Codeur Octave pour les basses
+Modif MidiVelocity pour les Basses
+
 Version Mega_20201116-01
 
 AccordeonMidiMega_20201116-01.ino

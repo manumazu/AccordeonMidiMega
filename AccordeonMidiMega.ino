@@ -225,14 +225,12 @@ void loop() {
       if (Etat_Touche_Basses[i][Etat_actuel] == ON) {
         PousseTire = Etat_TouchePousseTire[Etat_actuel] ? 1 : 2;
         Etat_Touche_Basses[i][Note_encours] = Touche_Basses[i][PousseTire];
+        Etat_Touche_Basses[i][Note_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
         Etat_Touche_Basses[i][Note2_encours] = Touche_Basses[i][PousseTire + 2]; //Deuxiéme note à jouer
-        if (Etat_ToucheOctave[Etat_actuel] == 1) {
-          Etat_Touche_Basses[i][Note_encours] += 12;   // On augmente la note de 12 tons
-          Etat_Touche_Basses[i][Note2_encours] += 12;  // On augmente la note de 12 tons
-        }
+        Etat_Touche_Basses[i][Note2_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
         //Note on channel 1 (0x90), some note value (note), middle velocity (0x45):
-        noteOn(0x90, Etat_Touche_Basses[i][Note_encours], 127);
-        noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], 127);
+        noteOn(0x90, Etat_Touche_Basses[i][Note_encours], MidiVelocity);
+        noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], MidiVelocity);
       }
       else
         //Note on channel 1 (0x90), some note value (note), silent velocity (0x00):
