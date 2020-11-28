@@ -1,9 +1,6 @@
-Version MegaMidiExt_20201128-01
-Création branche MidiExt Github
-
 Version Mega_20201128-01
-Suppression #Define InstrumentFR TonaliteFR et OctaveFR
-Suppression No_PinOctave No_PinInstrument
+Supression #Define InstrumentFR TonaliteFR et OctaveFR
+Supression No_PinOctave No_PinInstrument
 Ajout de basses 12 touches
 Gestion des accords de basses
 Bouton tierces On/Off
