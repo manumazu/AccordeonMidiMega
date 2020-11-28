@@ -1,9 +1,8 @@
 #define DEBUG;          // si Debug sur Moniteur série standard
-//#define InstrumentFR    // Si pas de codeur mais potentiomètre 10K
-//#define TonaliteFR      // Si pas de codeur mais bouton standard tonalité en INPUT_PULLUP
-//#define OctaveFR        // Si pas de codeur mais bouton standard Octave en INPUT_PULLUP
 
-#include "Def_AccordeonMidi.h"    //Defintion externe des touches, fichier à placer au même endroit que le fichier code ino
+const String Version = "Mega_20201128-01";
+
+#include "Def_AccordeonMidi.h"    //Définition externe des touches, fichier à placer au même endroit que le fichier code ino
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 16, 2);; //Afficheur 2 lignes 16 caractères adresse I2C 0x27
 
@@ -13,7 +12,7 @@ String Affiche;
 #include "Gestion_Midi.h"
 #include "Libelle_Midi.h"
 
-//Afichage de la ligne 1 ou 2 sur l'afficheur LCD
+//Affichage de la ligne 1 ou 2 sur l'afficheur LCD
 void Affiche_LCD(int ligne) {
   if (ligne == 1) {
     if (Etat_ToucheMidiInExt[Etat_actuel] == Midi_Interne) {
@@ -44,30 +43,29 @@ void setup() {
 
   lcd.init();                      // initialize the lcd
   lcd.backlight();
-  lcd.println("Mega_20201118-02"); //Affiche la version
-  delay(2000);                     
+  lcd.println(Version); //Affiche la version
+  delay(2000);
 
   // initialisation pin digital du tableau de Touches Mélodie en INPUT_PULLUP
   for (int i = 0; i < Nb_ToucheMelodie; i++) {
     pinMode(Touche_Melodie[i][No_Pin], INPUT_PULLUP);
   }
-  // initialisation pin analog en digital du tableau de Touches Basses en INPUT avec resistance pullup
+  // initialisation pin analog en digital du tableau de Touches Basses en INPUT_PULLUP
   for (int i = 0; i < Nb_ToucheBasses; i++) {
     pinMode(Touche_Basses[i][No_Pin], INPUT_PULLUP);
   }
 
-  // Initialisation Touche Octave et touche Midic Panic A modiier en Codeur
-  pinMode(No_PinOctave, INPUT_PULLUP);
   // Initialisation touche Midic Panic
   pinMode(No_PinPanic, INPUT_PULLUP);
   pinMode(No_PinMidiInExt, INPUT_PULLUP);
+  pinMode(No_PinTierceOnOff, INPUT_PULLUP);
   pinMode(No_PinPousseTire, INPUT_PULLUP);
 
   // Initialisation des codeurs instrument, tonalité et octave
   Init_Codeur();
 
 #if defined (DEBUG)
-  Serial.begin (9600);    //pour le debug ecran PC 9600
+  Serial.begin (9600);    //pour le debug écran PC 9600
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -103,11 +101,7 @@ void loop() {
   //Lecture des codeurs instrument, tonalité et octave
 
   //Codeur instrument
-#if defined  InstrumentFR
-  Etat_ToucheInstrument[Etat_actuel] = analogRead(No_PinInstrument) / 10;
-#else
   Etat_ToucheInstrument[Etat_actuel] = Lecture_Codeur(inst_codeur);
-#endif
   if (Etat_ToucheInstrument[Etat_actuel] != Etat_ToucheInstrument[Etat_avant]) {
 #if defined (DEBUG)
     Affiche = "Change Instrument ";
@@ -120,11 +114,7 @@ void loop() {
   }
 
   //Codeur Tona
-#if defined TonaliteFR
-  // A voir si utile
-#else
   Etat_ToucheTona[Etat_actuel] = Lecture_Codeur(tona_codeur);
-#endif
   if (Etat_ToucheTona[Etat_actuel] != Etat_ToucheTona[Etat_avant]) {
 #if defined (DEBUG)
     Affiche = "Change Tona ";
@@ -136,11 +126,7 @@ void loop() {
   }
 
   //Codeur Octave
-#if defined OctaveFR
-  Etat_ToucheOctave[Etat_actuel] = digitalRead(No_PinOctave);
-#else
   Etat_ToucheOctave[Etat_actuel] = Lecture_Codeur(octa_codeur);
-#endif
   if (Etat_ToucheOctave[Etat_actuel] != Etat_ToucheOctave[Etat_avant]) {
 #if defined (DEBUG)
     Affiche = "Change Octave ";
@@ -189,6 +175,135 @@ void loop() {
     Serial.println(Affiche);
 #endif
     Etat_TouchePousseTire[Etat_avant] = Etat_TouchePousseTire[Etat_actuel];
+
+    //inversion des notes poussé-tiré en cours
+    for (int i = 0; i < Nb_ToucheMelodie; i++) {
+      if (Etat_Touche_Melodie[i][Etat_actuel] == ON) {
+        noteOn(0x90, Etat_Touche_Melodie[i][Note_encours], 0x00);
+#if defined (DEBUG)
+        Affiche = "Pin ";
+        Affiche += Touche_Melodie[i][No_Pin];
+        Affiche += " Note2 ";
+        Affiche += Etat_Touche_Melodie[i][Note_encours];
+        Affiche +=  " OFF ";
+        Serial.println(Affiche);
+#endif
+        PousseTire = Etat_TouchePousseTire[Etat_actuel] ? 1 : 2;
+        Etat_Touche_Melodie[i][Note_encours] = Touche_Melodie[i][PousseTire];
+        Etat_Touche_Melodie[i][Note_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
+
+        Etat_Touche_Melodie[i][Note_encours] += Etat_ToucheTona[Etat_actuel];   // On ajuste avec la tona
+        noteOn(0x90, Etat_Touche_Melodie[i][Note_encours], MidiVelocity);
+#if defined (DEBUG)
+        Affiche = "Pin ";
+        Affiche += Touche_Melodie[i][No_Pin];
+        Affiche += " Note2 ";
+        Affiche += Etat_Touche_Melodie[i][Note_encours];
+        Affiche +=  " ON ";
+        Serial.println(Affiche);
+#endif
+      }
+    }
+    for (int i = 0; i < Nb_ToucheBasses; i++) {
+      if (Etat_Touche_Basses[i][Etat_actuel] == ON) {
+        noteOn(0x90, Etat_Touche_Basses[i][Note1_encours], 0x00);
+#if defined (DEBUG)
+        Affiche = "Pin ";
+        Affiche += Touche_Basses[i][No_Pin];
+        Affiche += " Note1 ";
+        Affiche += Etat_Touche_Basses[i][Note1_encours];
+        Affiche +=  " OFF ";
+        Serial.println(Affiche);
+#endif
+        PousseTire = Etat_TouchePousseTire[Etat_actuel] ? 1 : 2;
+        Etat_Touche_Basses[i][Note1_encours] = Touche_Basses[i][PousseTire];
+        Etat_Touche_Basses[i][Note1_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
+
+        Etat_Touche_Basses[i][Note1_encours] += Etat_ToucheTona[Etat_actuel];   // On ajuste avec la tona
+        noteOn(0x90, Etat_Touche_Basses[i][Note1_encours], MidiVelocity);
+#if defined (DEBUG)
+        Affiche = "Pin ";
+        Affiche += Touche_Basses[i][No_Pin];
+        Affiche += " Note1 ";
+        Affiche += Etat_Touche_Basses[i][Note1_encours];
+        Affiche +=  " ON ";
+        Serial.println(Affiche);
+#endif
+        if (Etat_ToucheTierceOnOff[Etat_actuel] == ON) {
+          noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], 0x00);
+#if defined (DEBUG)
+          Affiche = "Pin ";
+          Affiche += Touche_Basses[i][No_Pin];
+          Affiche += " Note2 ";
+          Affiche += Etat_Touche_Basses[i][Note2_encours];
+          Affiche +=  " OFF ";
+          Serial.println(Affiche);
+#endif
+          PousseTire = Etat_TouchePousseTire[Etat_actuel] ? 1 : 2;
+          Etat_Touche_Basses[i][Note2_encours] = Touche_Basses[i][PousseTire + 2];
+          Etat_Touche_Basses[i][Note2_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
+
+          Etat_Touche_Basses[i][Note2_encours] += Etat_ToucheTona[Etat_actuel];   // On ajuste avec la tona
+          noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], MidiVelocity);
+#if defined (DEBUG)
+          Affiche = "Pin ";
+          Affiche += Touche_Basses[i][No_Pin];
+          Affiche += " Note2 ";
+          Affiche += Etat_Touche_Basses[i][Note2_encours];
+          Affiche +=  " ON ";
+          Serial.println(Affiche);
+#endif
+        }
+        noteOn(0x90, Etat_Touche_Basses[i][Note3_encours], 0x00);
+#if defined (DEBUG)
+        Affiche = "Pin ";
+        Affiche += Touche_Basses[i][No_Pin];
+        Affiche += " Note3 ";
+        Affiche += Etat_Touche_Basses[i][Note3_encours];
+        Affiche +=  " OFF ";
+        Serial.println(Affiche);
+#endif
+        PousseTire = Etat_TouchePousseTire[Etat_actuel] ? 1 : 2;
+        Etat_Touche_Basses[i][Note3_encours] = Touche_Basses[i][PousseTire + 4];
+        Etat_Touche_Basses[i][Note3_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
+
+        Etat_Touche_Basses[i][Note3_encours] += Etat_ToucheTona[Etat_actuel];   // On ajuste avec la tona
+        noteOn(0x90, Etat_Touche_Basses[i][Note3_encours], MidiVelocity);
+#if defined (DEBUG)
+        Affiche = "Pin ";
+        Affiche += Touche_Basses[i][No_Pin];
+        Affiche += " Note3 ";
+        Affiche += Etat_Touche_Basses[i][Note3_encours];
+        Affiche +=  " ON ";
+        Serial.println(Affiche);
+#endif
+      }
+    }
+  }
+  //Touche TierceOnOff
+  Etat_ToucheTierceOnOff[Etat_actuel] = digitalRead(No_PinTierceOnOff);
+  if (Etat_ToucheTierceOnOff[Etat_actuel] != Etat_ToucheTierceOnOff[Etat_avant]) {
+#if defined (DEBUG)
+    Affiche = "Change TierceOnOff ";
+    Affiche += Etat_ToucheTierceOnOff[Etat_actuel] ? "OFF" : "ON";
+    Serial.println(Affiche);
+#endif
+    Etat_ToucheTierceOnOff[Etat_avant] = Etat_ToucheTierceOnOff[Etat_actuel];
+    //Arrêt des tierces en cours de jeu
+    if (Etat_ToucheTierceOnOff[Etat_actuel] == OFF)
+      for (int i = 0; i < Nb_ToucheBasses; i++) {
+        if (Etat_Touche_Basses[i][Etat_actuel] == ON) {
+          noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], 0x00);
+#if defined (DEBUG)
+          Affiche = "Pin ";
+          Affiche += Touche_Basses[i][No_Pin];
+          Affiche += " Note2 ";
+          Affiche += Etat_Touche_Basses[i][Note2_encours];
+          Affiche +=  " OFF ";
+          Serial.println(Affiche);
+#endif
+        }
+      }
   }
   //Lecture Etat touche Mélodie
   for (int i = 0; i < Nb_ToucheMelodie; i++) {
@@ -209,12 +324,12 @@ void loop() {
         noteOn(0x90, Etat_Touche_Melodie[i][Note_encours], 0x00);
 
       Etat_Touche_Melodie[i][Etat_avant] = Etat_Touche_Melodie[i][Etat_actuel];
+#if defined (DEBUG)
       Affiche = "Pin ";
       Affiche += Touche_Melodie[i][No_Pin];
       Affiche += " Note ";
       Affiche += Etat_Touche_Melodie[i][Note_encours];
       Affiche += Etat_Touche_Melodie[i][Etat_actuel] ? " OFF  " : " ON ";
-#if defined (DEBUG)
       Serial.println(Affiche);
 #endif
     }
@@ -225,31 +340,46 @@ void loop() {
     if (Etat_Touche_Basses[i][Etat_actuel] != Etat_Touche_Basses[i][Etat_avant]) {
       if (Etat_Touche_Basses[i][Etat_actuel] == ON) {
         PousseTire = Etat_TouchePousseTire[Etat_actuel] ? 1 : 2;
-        Etat_Touche_Basses[i][Note_encours] = Touche_Basses[i][PousseTire];
-        Etat_Touche_Basses[i][Note_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
-        Etat_Touche_Basses[i][Note2_encours] = Touche_Basses[i][PousseTire + 2]; //Deuxiéme note à jouer
-        Etat_Touche_Basses[i][Note2_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
-        //Note on channel 1 (0x90), some note value (note), middle velocity (0x45):
-        noteOn(0x90, Etat_Touche_Basses[i][Note_encours], MidiVelocity);
-        noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], MidiVelocity);
+        Etat_Touche_Basses[i][Note1_encours] = Touche_Basses[i][PousseTire];
+        Etat_Touche_Basses[i][Note1_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
+        noteOn(0x90, Etat_Touche_Basses[i][Note1_encours], MidiVelocity);
+        if (Etat_ToucheTierceOnOff[Etat_actuel] == ON) {
+          Etat_Touche_Basses[i][Note2_encours] = Touche_Basses[i][PousseTire + 2]; //Deuxième note à jouer
+          Etat_Touche_Basses[i][Note2_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
+          noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], MidiVelocity);
+        }
+        Etat_Touche_Basses[i][Note3_encours] = Touche_Basses[i][PousseTire + 4]; //Troisième note à jouer
+        Etat_Touche_Basses[i][Note3_encours] += (12 * Etat_ToucheOctave[Etat_actuel]); // On augmente la note de + ou - n fois 12 tons
+        noteOn(0x90, Etat_Touche_Basses[i][Note3_encours], MidiVelocity);
       }
       else
+      {
         //Note on channel 1 (0x90), some note value (note), silent velocity (0x00):
-        noteOn(0x90, Etat_Touche_Basses[i][Note_encours], 0x00);
-      noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], 0x00);
-
+        noteOn(0x90, Etat_Touche_Basses[i][Note1_encours], 0x00);
+        if (Etat_ToucheTierceOnOff[Etat_actuel] == ON)
+          noteOn(0x90, Etat_Touche_Basses[i][Note2_encours], 0x00);
+        noteOn(0x90, Etat_Touche_Basses[i][Note3_encours], 0x00);
+      }
       Etat_Touche_Basses[i][Etat_avant] = Etat_Touche_Basses[i][Etat_actuel];
 #if defined (DEBUG)
       Affiche = "Pin ";
       Affiche += Touche_Basses[i][No_Pin];
-      Affiche += " Note ";
-      Affiche += Etat_Touche_Basses[i][Note_encours];
+      Affiche += " Note1 ";
+      Affiche += Etat_Touche_Basses[i][Note1_encours];
       Affiche += Etat_Touche_Basses[i][Etat_actuel] ? " OFF  " : " ON ";
       Serial.println(Affiche);
+      if (Etat_ToucheTierceOnOff[Etat_actuel] == ON) {
+        Affiche = "Pin ";
+        Affiche += Touche_Basses[i][No_Pin];
+        Affiche += " Note2 ";
+        Affiche += Etat_Touche_Basses[i][Note2_encours];
+        Affiche += Etat_Touche_Basses[i][Etat_actuel] ? " OFF  " : " ON ";
+        Serial.println(Affiche);
+      }
       Affiche = "Pin ";
       Affiche += Touche_Basses[i][No_Pin];
-      Affiche += " Note2 ";
-      Affiche += Etat_Touche_Basses[i][Note2_encours];
+      Affiche += " Note3 ";
+      Affiche += Etat_Touche_Basses[i][Note3_encours];
       Affiche += Etat_Touche_Basses[i][Etat_actuel] ? " OFF  " : " ON ";
       Serial.println(Affiche);
 #endif

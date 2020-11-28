@@ -1,3 +1,15 @@
+Version Mega_20201128-01
+Supression #Define InstrumentFR TonaliteFR et OctaveFR
+Supression No_PinOctave No_PinInstrument
+Ajout de basses 12 touches
+Gestion des accords de basses
+Bouton tierces On/Off
+Gestion de l'arrêt de la tierce en cours de jeu si bouton tierce Off
+Gestion du changement de note en cours de jeu avec action poussé-tiré/tiré-poussé
+No_PinTierceOnOff = A12;   
+No_PinPousseTire = A13;   //A adapter après choix mécanisme pousse-tire et vélocité  
+
+
 Version Mega_20201118-02
 Affiche version au démarrage
 
