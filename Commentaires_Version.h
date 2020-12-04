@@ -1,3 +1,8 @@
+Version à changer dans AccordeonMidiMega.ino à chaque versement sur GitHub !
+
+Version Mega_20201204
+Maj Tableau touches Mélodies et Basses
+
 Version Mega_20201128-01
 Supression #Define InstrumentFR TonaliteFR et OctaveFR
 Supression No_PinOctave No_PinInstrument

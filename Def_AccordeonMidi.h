@@ -1,5 +1,5 @@
 // Fichier de définition de la carte, Touche mélodies, touches et des variables de touches, etc
-// Modif le 13/11/2020
+//
 
 // Carte MEGA
 //Pin Midi interne  On utilise le Serial1 avec la Pin TX 18
@@ -27,33 +27,33 @@ le troisème nombre = le code midi en tiré
 
 const int Touche_Melodie[Nb_ToucheMelodie][3] = {
 
-{22,26,30},    // Touche mélodie 1
-{24,31,33},    // Touche mélodie 2
-{26,35,36},    // Touche mélodie 3
-{28,38,40},    // Touche mélodie 4
-{30,43,42},    // Touche mélodie 5
-{32,47,45},    // Touche mélodie 6
-{34,50,48},    // Touche mélodie 7
-{36,55,52},    // Touche mélodie 8
-{38,59,54},    // Touche mélodie 9
-{40,62,57},    // Touche mélodie 10
-{42,31,35},    // Touche mélodie 11
-{44,36,38},    // Touche mélodie 12
-{46,40,41},    // Touche mélodie 13
-{48,43,45},    // Touche mélodie 14
-{50,48,47},    // Touche mélodie 15
-{52,52,50},    // Touche mélodie 16
-{31,55,53},    // Touche mélodie 17
-{33,60,57},    // Touche mélodie 18
-{35,64,59},    // Touche mélodie 19
-{37,33,37},    // Touche mélodie 20
-{39,39,43},    // Touche mélodie 21
-{41,44,44},    // Touche mélodie 22
-{43,45,46},    // Touche mélodie 23
-{45,51,49},    // Touche mélodie 24
-{47,56,55},    // Touche mélodie 25
-{49,57,56},    // Touche mélodie 26
-{51,51,58}     // Touche mélodie 27
+{22,50,54},    // Touche mélodie 1 Rangée extérieure
+{24,55,57},    // Touche mélodie 2
+{26,59,60},    // Touche mélodie 3
+{28,62,64},    // Touche mélodie 4
+{30,67,66},    // Touche mélodie 5
+{32,71,69},    // Touche mélodie 6
+{34,74,72},    // Touche mélodie 7
+{36,79,76},    // Touche mélodie 8
+{38,83,78},    // Touche mélodie 9
+{40,86,81},    // Touche mélodie 10
+{42,55,59},    // Touche mélodie 11 Rangée du milieu
+{44,60,62},    // Touche mélodie 12
+{46,64,65},    // Touche mélodie 13
+{48,67,69},    // Touche mélodie 14
+{50,72,71},    // Touche mélodie 15
+{52,76,74},    // Touche mélodie 16
+{31,79,77},    // Touche mélodie 17
+{33,84,81},    // Touche mélodie 18
+{35,88,83},    // Touche mélodie 19
+{37,57,61},    // Touche mélodie 20 Rangée intérieure
+{39,63,67},    // Touche mélodie 21
+{41,68,68},    // Touche mélodie 22
+{43,69,70},    // Touche mélodie 23
+{45,75,73},    // Touche mélodie 24
+{47,80,79},    // Touche mélodie 25
+{49,81,80},    // Touche mélodie 26
+{51,87,82}     // Touche mélodie 27
 };
 
 /*
@@ -78,18 +78,19 @@ const int Nb_ToucheBasses = 12;
 
 const int Touche_Basses[Nb_ToucheBasses][7] = {
 
-{A0,38,33,40,35,43,38},    // Touche basses 1
-{A1,31,26,40,35,43,38},    // Touche basses 2
-{A2,36,36,40,40,43,43},    // Touche basses 3
-{A3,24,31,30,40,36,43},    // Touche basses 4
-{A4,35,33,37,44,40,47},    // Touche basses 5
-{A5,28,33,37,44,40,45},    // Touche basses 6
-{A6,36,36,38,38,41,41},    // Touche basses 7
-{A7,29,29,38,38,41,41},    // Touche basses 8
-{A8,28,33,32,37,35,40},    // Touche basses 9
-{A9,27,32,31,36,34,39},    // Touche basses 10
-{A10,26,31,30,35,33,38},   // Touche basses 11
-{A11,25,30,29,34,32,37}};  // Touche basses 12
+{A0,80,83,84,86,87,90},    // Touche accord 28
+{A1,56,59,68,71,80,83},    // Touche basses 29  
+{A2,79,74,83,77,86,81},    // Touche accord 30
+{A3,55,50,67,62,79,74},    // Touche basses 31
+{A4,72,79,76,83,79,86},    // Touche accord 32
+{A5,48,55,60,67,72,79},    // Touche basses 33
+{A6,75,82,78,86,82,89},    // Touche accord 34
+{A7,51,58,63,70,75,82},    // Touche basses 35
+{A8,76,76,79,80,83,83},    // Touche accord 36
+{A9,52,57,64,69,76,81},    // Touche basses 37
+{A10,77,77,81,81,84,84},   // Touche accord 38
+{A11,53,53,65,65,77,77}    // Touche basses 39
+};  
 
 /* A0 = Pin 54 --- A11 = Pin 65
 

@@ -1,6 +1,6 @@
 #define DEBUG;          // si Debug sur Moniteur série standard
 
-const String Version = "Mega_20201128-01";
+const String Version = "Mega_20201204-01";
 
 #include "Def_AccordeonMidi.h"    //Définition externe des touches, fichier à placer au même endroit que le fichier code ino
 #include <LiquidCrystal_I2C.h>
