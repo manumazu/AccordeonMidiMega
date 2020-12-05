@@ -1,5 +1,10 @@
 Version à changer dans AccordeonMidiMega.ino à chaque versement sur GitHub !
 
+Version Mega_20201205
+Bouton tierces n'agit que sur les accords
+Ajout Bouton Basses Profondes
+Correction ajustement tona sur Basses et Accords
+
 Version Mega_20201204
 Maj Tableau touches Mélodies et Basses
 

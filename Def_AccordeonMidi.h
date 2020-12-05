@@ -10,6 +10,7 @@ const int No_PinMidiInExt = 11;
 const int No_PinPanic = 12;
 const int No_PinTierceOnOff = A12;   
 const int No_PinPousseTire = A13;   //A adapter après choix mécanisme pousse-tire et vélocité  
+const int No_PinBassesProf = 15;    //A adapter après choix pins définitif
 
 const int No_Pin = 0;
 const int NotePousse = 1;
@@ -112,6 +113,7 @@ int Etat_ToucheTierceOnOff[2] =  {OFF, OFF};
 int Etat_TouchePanic[2] =        {OFF, OFF};
 int Etat_ToucheMidiInExt[2] =    {OFF, OFF};
 int Etat_TouchePousseTire[2] =   {OFF, OFF};
+int Etat_ToucheBassesProf[2] =   {OFF, OFF};
 
 const int Etat_actuel = 0;
 const int Etat_avant = 1;
