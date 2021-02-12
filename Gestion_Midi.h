@@ -20,8 +20,17 @@ void Instrument(byte channel, int Program, int IntExt) {
     Serial2.write(0x20);       //LSB
     Serial2.write(BankLSB);    //Bank
     Serial2.write(0xC0 | channel);
-    Serial2.write(Program);    //Instrument
+    Serial2.write(Program);    //Program
   }
+#if defined (DEBUG)
+  AfficheDebug = "Appel Instrument Channel ";
+  AfficheDebug += channel;
+  AfficheDebug += " Program ";
+  AfficheDebug += Program;
+  AfficheDebug += " Midi ";
+  AfficheDebug += IntExt ? "Externe" : "Interne";
+  Serial.println(AfficheDebug);
+#endif
 }
 void InitMidi() {
   // Changement de banque MSB LSB générique standard

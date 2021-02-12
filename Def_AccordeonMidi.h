@@ -11,6 +11,7 @@ const int OFF = HIGH;
 
 const int No_PinMidiInExt = 19;
 const int No_PinPanic = 15;
+const int No_PinMute = 53;
 const int No_PinTierceOnOff = A0;
 const int No_PinBassesProf = A1;
 
@@ -18,8 +19,7 @@ const int No_PinVolume = A14;     //Analogique A adapter après choix mécanisme
 const int No_PinPousseTire = A15;   //A adapter après choix mécanisme pousse-tire et vélocité
 
 const int No_Pin = 0;
-const int NotePousse = 1;
-const int NoteTire = 2;
+
 const int Nb_ToucheMelodie = 27;
 
 const int InstrumentDef = 0;      //Instrument par défaut Accordéon 1ere bank tsunami
@@ -34,39 +34,40 @@ const int Midi_Ext = 1;
 /*
   Association des codes MIDI pour le clavier main droite (mélodie)
   le premier nombre = le numéro de la Pin
-  le deuxième nombre = le code midi en poussé
-  le troisème nombre = le code midi en tiré
+  le deuxième nombre = le code midi Basson en poussé
+  le troisème nombre = le code midi Basson en tiré
+  le quatrième nombre = le code midi Flûte en poussé
+  le cinquième nombre = le code midi Flûte en tiré
 */
 
-const int Touche_Melodie[Nb_ToucheMelodie][3] = {
-
-  {22, 50, 54},  // Touche mélodie 1 Rangée extérieure
-  {24, 55, 57},  // Touche mélodie 2
-  {26, 59, 60},  // Touche mélodie 3
-  {28, 62, 64},  // Touche mélodie 4
-  {30, 67, 66},  // Touche mélodie 5
-  {32, 71, 69},  // Touche mélodie 6
-  {34, 74, 72},  // Touche mélodie 7
-  {36, 79, 76},  // Touche mélodie 8
-  {38, 83, 78},  // Touche mélodie 9
-  {40, 86, 81},  // Touche mélodie 10
-  {42, 55, 59},  // Touche mélodie 11 Rangée du milieu
-  {44, 60, 62},  // Touche mélodie 12
-  {46, 64, 65},  // Touche mélodie 13
-  {48, 67, 69},  // Touche mélodie 14
-  {50, 72, 71},  // Touche mélodie 15
-  {52, 76, 74},  // Touche mélodie 16
-  {31, 79, 77},  // Touche mélodie 17
-  {33, 84, 81},  // Touche mélodie 18
-  {35, 88, 83},  // Touche mélodie 19
-  {37, 57, 61},  // Touche mélodie 20 Rangée intérieure
-  {39, 63, 67},  // Touche mélodie 21
-  {41, 68, 68},  // Touche mélodie 22
-  {43, 69, 70},  // Touche mélodie 23
-  {45, 75, 73},  // Touche mélodie 24
-  {47, 80, 79},  // Touche mélodie 25
-  {49, 81, 80},  // Touche mélodie 26
-  {51, 87, 82}   // Touche mélodie 27
+const int Touche_Melodie[Nb_ToucheMelodie][5] = {
+  {22, 50, 54, 62, 66},  // Touche mélodie 1 Rangée extérieure
+  {24, 55, 57, 67, 69},  // Touche mélodie 2
+  {26, 59, 60, 71, 72},  // Touche mélodie 3
+  {28, 62, 64, 74, 76},  // Touche mélodie 4
+  {30, 67, 66, 79, 78},  // Touche mélodie 5
+  {32, 71, 69, 83, 81},  // Touche mélodie 6
+  {34, 74, 72, 86, 84},  // Touche mélodie 7
+  {36, 79, 76, 91, 88},  // Touche mélodie 8
+  {38, 83, 78, 95, 90},  // Touche mélodie 9
+  {40, 86, 81, 98, 93},  // Touche mélodie 10
+  {42, 55, 59, 67, 71},  // Touche mélodie 11 Rangée du milieu
+  {44, 60, 62, 72, 74},  // Touche mélodie 12
+  {46, 64, 65, 76, 77},  // Touche mélodie 13
+  {48, 67, 69, 79, 81},  // Touche mélodie 14
+  {50, 72, 71, 84, 83},  // Touche mélodie 15
+  {52, 76, 74, 88, 86},  // Touche mélodie 16
+  {31, 79, 77, 91, 89},  // Touche mélodie 17
+  {33, 84, 81, 96, 93},  // Touche mélodie 18
+  {35, 88, 83, 100, 95}, // Touche mélodie 19
+  {37, 57, 61, 69, 73},  // Touche mélodie 20 Rangée intérieure
+  {39, 63, 67, 75, 79},  // Touche mélodie 21
+  {41, 68, 68, 80, 80},  // Touche mélodie 22
+  {43, 69, 70, 81, 82},  // Touche mélodie 23
+  {45, 75, 73, 87, 85},  // Touche mélodie 24
+  {47, 80, 79, 92, 91},  // Touche mélodie 25
+  {49, 81, 80, 93, 92},  // Touche mélodie 26
+  {51, 87, 82, 99, 94}   // Touche mélodie 27
 };
 
 /*
@@ -81,12 +82,6 @@ const int Touche_Melodie[Nb_ToucheMelodie][3] = {
   le septième nombre = le code midi en tiré pour la troisième note
   Les Touches basses/accord sont géré par les multiplexeurs, HIGH = Off, LOW = On */
 
-const int NoteAccordPousse = 1;
-const int NoteAccordTire = 2;
-const int Note2AccordPousse = 3;
-const int Note2AccordTire = 4;
-const int Note3AccordPousse = 5;
-const int Note3AccordTire = 6;
 const int Nb_ToucheAccord = 6;
 
 const int Touche_Accord[Nb_ToucheAccord][7] = {
@@ -140,55 +135,75 @@ int Etat_ToucheBassesProf[2] =   {OFF, OFF};
 int Etat_ToucheMidiMSB[2] =      {0, 0};         // Midi Bank MSB valeur entre 0 et 127
 int Etat_ToucheMidiLSB[2] =      {0, 0};         // Midi Bank LSBvaleur entre 0 et 127
 int Etat_ToucheInstrumentE[2] =  {InstrumentExtDef, 0}; // valeur entre 0 et 127
-int Etat_ToucheRegistre[2] =  {0, 0};            // valeur 0 Flûte, 1 Basson, 2 Flüte+Basson
-int PinMux1Flute = 6;
-int PinMux1Basson = 7;
-int PinMux2FluteBasson = 6;
-const String Libelle_Registre[3] = {             // Ecran LCD n'aime pas les accents!
-  {"Flute"},
-  {"Basson"},
-  {"Flute + Basson"}
+int Etat_ToucheRegistre[2] =  {0, 0};            // valeur 0 Basson, 1 Flüte+Basson, 2 Flûte
+int PinMux1Basson = 6;
+int PinMux1FluteBasson = 7;
+int PinMux2Flute = 6;
+int RegistreBasson = 0;
+int RegistreFluteBasson = 1;
+int RegistreFlute = 2;
+
+const String Libelle_Registre[3] = {             // Ecran LCD
+  {"BA   "},
+  {"BA/FL"},
+  {"FL   "}
 };
+
+const String Libelle_Tona[13] = {                 // Libellé Tona de -6 à +6
+  {"DO#/FA#  (-6)"},
+  {"RE/SOL   (-5)"},
+  {"RE#/SOL# (-4)"},
+  {"MI/LA    (-3)"},
+  {"FA/LA#   (-2)"},
+  {"FA#/SI   (-1)"},
+  {"SOL/DO    (0)"},
+  {"SOL#/DO# (+1)"},
+  {"LA/RE    (+2)"},
+  {"LA#/RE#  (+3)"},
+  {"SI/MI    (+4)"},
+  {"DO/FA    (+5)"},
+  {"DO#/FA#  (+6)"}
+};
+
 const int Etat_actuel = 0;
 const int Etat_avant = 1;
-const int Note_encours = 2;
-
-int PousseTire;
-
-// Etat actuel, Etat avant, Note en cours
-int Etat_Touche_Melodie[Nb_ToucheMelodie][3] = {
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-  {OFF, OFF, 0},
-};
-
 const int Note1_encours = 2;
 const int Note2_encours = 3;
 const int Note3_encours = 4;
+
+
+int PousseTire;
+
+// Etat actuel, Etat avant, Note1 en cours Basson, Note2 en cours Flûte
+int Etat_Touche_Melodie[Nb_ToucheMelodie][4] = {
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+  {OFF, OFF, 0, 0},
+};
 
 // Etat actuel, Etat avant, Note1 en cours, Note2 en cours, Note3 en cours
 int Etat_Touche_Basses[Nb_ToucheBasses][5] = {

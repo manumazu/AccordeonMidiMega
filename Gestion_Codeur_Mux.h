@@ -281,8 +281,8 @@ void Init_Mux() {
   pinMode(No_PinMuxAddr1, OUTPUT);
   pinMode(No_PinMuxAddr2, OUTPUT);
   pinMode(No_PinMuxAddr3, OUTPUT);
-  pinMode(No_PinEtatMux1, INPUT_PULLUP);  //A changer en INPUT
-  pinMode(No_PinEtatMux2, INPUT_PULLUP);  //A changer en INPUT
+  pinMode(No_PinEtatMux1, INPUT_PULLUP);
+  pinMode(No_PinEtatMux2, INPUT_PULLUP);
   // On fait une lecture pour initialiser les variables.
   Lecture_Mux();
 }

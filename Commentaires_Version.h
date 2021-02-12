@@ -1,11 +1,19 @@
 Version à changer dans AccordeonMidiMega.ino à chaque versement sur GitHub !
 
+Version "Robert_20210212-1   "
+Formatage "automatique" par Ctrl t de tous les fichiers du croquis pour faciliter la comparaison entre version
+Maj affichage Tona, Program pour Midi Externe et autres info
+deMute ampli après l'init sur pin 53
+Actions sur Registre avec Basson par défaut (BA, BA/FL, FL), le tableau de notes mélodie est doublée (Basson, Flûte)
+Les changements Pousse-tire, Tierces, Basses profondes et registre sont appliqués sur l'ensemble des notes en cours de jeu
+Le changement d'instrument doit se faire sans jeu de note en cours
+
 Version "Robert_20210124-1   "
 Changement afficheur Lcd => 4 lignes 20 caractères
-Implémentation multiplexeurs pour touches Basses et Accords (4 boutons en réserve addr 6 et 7)
+Implémentation multiplexeurs pour touches Basses et Accords (1 bouton en réserve mux2 addr 7)
 Duplication du même codeur Instrument pour mémoriser Instrument Midi en interne et externe
 Codeur Renversement accord, trois valeurs: normal, 1er renversement, 2eme renversement
-Poussoir Registre Flute, Basson, Flute / Basson  mais sans action
+Poussoir Registre Flute, Basson, Flute / Basson  sur Mux mais sans action
 Midi généré simultanément en Interne ET externe
 Instrument Midi interne par défaut 0 => 1ere bank Tsunami
 MAj liste instruments Midi Interne (Banks Tsunami)
@@ -27,12 +35,12 @@ Correction ajustement tona sur Basses et Accords
 Version Mega_20201204
 Maj Tableau touches Mélodies et Basses
 
-Version Mega_20201128-01
+Version Mega_20201128 - 01
 Suppression #Define InstrumentFR TonaliteFR et OctaveFR
 Suppression No_PinOctave No_PinInstrument
 Ajout de basses 12 touches
 Gestion des accords de basses
-Bouton tierces On/Off
+Bouton tierces On / Off
 Gestion de l'arrêt de la tierce en cours de jeu si bouton tierce Off
 Gestion du changement de note en cours de jeu avec action poussé -tiré / tiré -poussé
 No_PinTierceOnOff = A12;
@@ -62,6 +70,6 @@ Gestion_Codeur.h
 modif codeur_position_Min et codeur_position_Max
 AccordeonMidiMega_20201116 - 01.ino
 Ajout de + ou - x fois octave
-Etat_Touche_Melodie[i][Note_encours] += (12 * Etat_ToucheOctave[Etat_actuel]);
+Etat_Touche_Melodie[i][Note1_encours] += (12 * Etat_ToucheOctave[Etat_actuel]);
 
 ______________________________________________________________________________________
