@@ -11,12 +11,9 @@ const int OFF = HIGH;
 
 const int No_PinMidiInExt = 19;
 const int No_PinPanic = 15;
-const int No_PinMute = 53;
+const int No_PinMute = A5;
 const int No_PinTierceOnOff = A0;
 const int No_PinBassesProf = A1;
-
-const int No_PinVolume = A14;     //Analogique A adapter après choix mécanisme pousse-tire et volume
-const int No_PinPousseTire = A15;   //A adapter après choix mécanisme pousse-tire et vélocité
 
 const int No_Pin = 0;
 
@@ -27,10 +24,11 @@ const int InstrumentExtDef = 21;  //Instrument par défaut Accordéon Midi Exter
 const byte ChannelMelodie = 0;    // Channel pour les touches Mélodies
 const byte ChannelBasses = 1;     // Channel pour les touches Mélodies
 const byte ChannelAccord = 2;     // Channel pour les touches Mélodies
-const int MidiVelocity = 64;      //Vélocité constante par défaut (1 à 127)
 const int Midi_Interne = OFF;     //Etat initial du bouton Midi Interne/Externe sur Interne au repos
 const int Midi_Int = 0;
 const int Midi_Ext = 1;
+int MidiVelocity = 64;           //Vélocité constante par défaut (1 à 127)
+
 /*
   Association des codes MIDI pour le clavier main droite (mélodie)
   le premier nombre = le numéro de la Pin
@@ -122,20 +120,21 @@ const int Touche_Basses[Nb_ToucheBasses][7] = {
 */
 
 // Etat actuel, Etat avant
-int Etat_ToucheInstrument[2] =   {InstrumentDef, 0}; // valeur entre 0 et 127
-int Etat_ToucheTona[2] =         {0, 0};
-int Etat_ToucheOctave[2] =       {0, 0};
-int Etat_ToucheRenvAccord[2] =   {0, 0};
-int Etat_ToucheTierceOnOff[2] =  {OFF, OFF};
-int Etat_TouchePanic[2] =        {OFF, OFF};
-int Etat_ToucheMidiInExt[2] =    {OFF, OFF};
-int Etat_TouchePousseTire[2] =   {OFF, OFF};
-int Etat_ToucheVolume[2] =     {0, 0};
-int Etat_ToucheBassesProf[2] =   {OFF, OFF};
-int Etat_ToucheMidiMSB[2] =      {0, 0};         // Midi Bank MSB valeur entre 0 et 127
-int Etat_ToucheMidiLSB[2] =      {0, 0};         // Midi Bank LSBvaleur entre 0 et 127
-int Etat_ToucheInstrumentE[2] =  {InstrumentExtDef, 0}; // valeur entre 0 et 127
-int Etat_ToucheRegistre[2] =  {0, 0};            // valeur 0 Basson, 1 Flüte+Basson, 2 Flûte
+int Etat_Instrument[2] =   {InstrumentDef, 0}; // valeur entre 0 et 127
+int Etat_Tona[2] =         {0, 0};
+int Etat_Octave[2] =       {0, 0};
+int Etat_RenvAccord[2] =   {0, 0};
+int Etat_TierceOnOff[2] =  {OFF, OFF};
+int Etat_Panic[2] =        {OFF, OFF};
+int Etat_MidiInExt[2] =    {OFF, OFF};
+int Etat_PousseTire[2] =   {OFF, OFF};
+int Etat_BassesProf[2] =   {OFF, OFF};
+int Etat_MidiMSB[2] =      {0, 0};         // Midi Bank MSB valeur entre 0 et 127
+int Etat_MidiLSB[2] =      {0, 0};         // Midi Bank LSBvaleur entre 0 et 127
+int Etat_InstrumentE[2] =  {InstrumentExtDef, 0}; // valeur entre 0 et 127
+int Etat_Registre[2] =  {0, 0};            // valeur 0 Basson, 1 Flüte+Basson, 2 Flûte
+int Etat_Volume_Midi[2] =     {0, 0};            // Valeur Midi calculé du Volume
+unsigned long Etat_Volume_Millis[2] =     {0, 0};// Valeur Milliseconde au moment de la lecture
 int PinMux1Basson = 6;
 int PinMux1FluteBasson = 7;
 int PinMux2Flute = 6;

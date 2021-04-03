@@ -131,11 +131,11 @@ int Lecture_Codeur(int num_codeur, bool boucle) {
 int Lecture_SwitchCodeur() {
   int retour = OFF;               // Si retour ON, faire un rafraichissement LCD
 
-  if (Etat_ToucheMidiInExt[Etat_actuel] == Midi_Interne) {
+  if (Etat_MidiInExt[Etat_actuel] == Midi_Interne) {
     Etat_SwitchInst[Etat_actuel] = digitalRead(inst_codeur_switch);     // Détection du switch codeur inst
     if (Etat_SwitchInst[Etat_actuel] != Etat_SwitchInst[Etat_avant]) {
       Etat_SwitchInst[Etat_avant] = Etat_SwitchInst[Etat_actuel];
-      Etat_ToucheInstrument[Etat_actuel] = InstrumentDef;               // Réinit du compteur inst
+      Etat_Instrument[Etat_actuel] = InstrumentDef;               // Réinit du compteur inst
       codeur_position[inst_codeur] = InstrumentDef;                     // Réinit du codeur inst
       retour = ON;
 #if defined (DEBUG)
@@ -149,7 +149,7 @@ int Lecture_SwitchCodeur() {
     Etat_SwitchInsE[Etat_actuel] = digitalRead(insE_codeur_switch);     // Détection du switch codeur insE
     if (Etat_SwitchInsE[Etat_actuel] != Etat_SwitchInsE[Etat_avant]) {
       Etat_SwitchInsE[Etat_avant] = Etat_SwitchInsE[Etat_actuel];
-      Etat_ToucheInstrumentE[Etat_actuel] = InstrumentExtDef;              // Réinit du compteur insE
+      Etat_InstrumentE[Etat_actuel] = InstrumentExtDef;              // Réinit du compteur insE
       codeur_position[insE_codeur] = InstrumentExtDef;                     // Réinit du codeur insE
       retour = ON;
 #if defined (DEBUG)
@@ -163,8 +163,8 @@ int Lecture_SwitchCodeur() {
   Etat_SwitchTona[Etat_actuel] = digitalRead(tona_codeur_switch);       // Détection du switch codeur tona
   if (Etat_SwitchTona[Etat_actuel] != Etat_SwitchTona[Etat_avant]) {
     Etat_SwitchTona[Etat_avant] = Etat_SwitchTona[Etat_actuel];
-    Etat_ToucheTona[Etat_actuel] = 0;                                   // Réinit du compteur tona
-    Etat_ToucheTona[Etat_avant] = 0;
+    Etat_Tona[Etat_actuel] = 0;                                   // Réinit du compteur tona
+    Etat_Tona[Etat_avant] = 0;
     codeur_position[tona_codeur] = 0;                                   // Réinit du codeur tona
     retour = ON;
 #if defined (DEBUG)
@@ -177,8 +177,8 @@ int Lecture_SwitchCodeur() {
   Etat_SwitchOcta[Etat_actuel] = digitalRead(octa_codeur_switch);       // Détection du switch codeur octave
   if (Etat_SwitchOcta[Etat_actuel] != Etat_SwitchOcta[Etat_avant]) {
     Etat_SwitchOcta[Etat_avant] = Etat_SwitchOcta[Etat_actuel];
-    Etat_ToucheOctave[Etat_actuel] = 0;                                 // Réinit du compteur octave
-    Etat_ToucheOctave[Etat_avant] = 0;                                  // Réinit du compteur octave
+    Etat_Octave[Etat_actuel] = 0;                                 // Réinit du compteur octave
+    Etat_Octave[Etat_avant] = 0;                                  // Réinit du compteur octave
     codeur_position[octa_codeur] = 0;                                   // Réinit du codeur octave
     retour = ON;
 #if defined (DEBUG)
@@ -191,8 +191,8 @@ int Lecture_SwitchCodeur() {
   Etat_SwitchRenv[Etat_actuel] = digitalRead(renv_codeur_switch);       // Détection du switch codeur renversement
   if (Etat_SwitchRenv[Etat_actuel] != Etat_SwitchRenv[Etat_avant]) {
     Etat_SwitchRenv[Etat_avant] = Etat_SwitchRenv[Etat_actuel];
-    Etat_ToucheRenvAccord[Etat_actuel] = 0;                             // Réinit du compteur renversement
-    Etat_ToucheRenvAccord[Etat_avant] = 0;                              // Réinit du compteur renversement
+    Etat_RenvAccord[Etat_actuel] = 0;                             // Réinit du compteur renversement
+    Etat_RenvAccord[Etat_avant] = 0;                              // Réinit du compteur renversement
     codeur_position[renv_codeur] = 0;                                   // Réinit du codeur renversement
     retour = ON;
 #if defined (DEBUG)
@@ -202,7 +202,7 @@ int Lecture_SwitchCodeur() {
 #endif
   }
 
-  if (Etat_ToucheMidiInExt[Etat_actuel] != Midi_Interne) {
+  if (Etat_MidiInExt[Etat_actuel] != Midi_Interne) {
     Etat_SwitchMMSB[Etat_actuel] = digitalRead(MMSB_codeur_switch);     // Détection du switch codeur MSB/LSB
     if (Etat_SwitchMMSB[Etat_actuel] != Etat_SwitchMMSB[Etat_avant]) {
       Etat_SwitchMMSB[Etat_avant] = Etat_SwitchMMSB[Etat_actuel];

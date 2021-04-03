@@ -1,11 +1,20 @@
 Version à changer dans AccordeonMidiMega.ino à chaque versement sur GitHub !
 
+Version "Robert_20210403-1   "
+Codage pour gestion capteur de force HX711, pression BM280, pression Honeywell ou pédale analogique+bouton pousse-tire avec un .h par type de capteur
+Remplissage du tableau Const_Volume_Capteur à partir d'une feuille Excel
+Nettoyage de noms de variables et création de noteOff
+Affichage du volume/vélocité sur LCD ligne 2
+Version Volume avec 1 capteur de force ou pression et calcul de vélocité, pas de changement pour les notes en cours de jeu
+Option de compil pour appliquer la valeur calculée capteur / pédale au volume Midi ou à la vélocité midi
+Changement deMute ampli pin A5
+
 Version "Robert_20210212-1   "
 Formatage "automatique" par Ctrl t de tous les fichiers du croquis pour faciliter la comparaison entre version
 Maj affichage Tona, Program pour Midi Externe et autres info
 deMute ampli après l'init sur pin 53
-Actions sur Registre avec Basson par défaut (BA, BA/FL, FL), le tableau de notes mélodie est doublée (Basson, Flûte)
-Les changements Pousse-tire, Tierces, Basses profondes et registre sont appliqués sur l'ensemble des notes en cours de jeu
+Actions sur Registre avec Basson par défaut (BA, BA / FL, FL), le tableau de notes mélodie est doublée (Basson, Flûte)
+Les changements Pousse - tire, Tierces, Basses profondes et registre sont appliqués sur l'ensemble des notes en cours de jeu
 Le changement d'instrument doit se faire sans jeu de note en cours
 
 Version "Robert_20210124-1   "
@@ -70,6 +79,6 @@ Gestion_Codeur.h
 modif codeur_position_Min et codeur_position_Max
 AccordeonMidiMega_20201116 - 01.ino
 Ajout de + ou - x fois octave
-Etat_Touche_Melodie[i][Note1_encours] += (12 * Etat_ToucheOctave[Etat_actuel]);
+Etat_Touche_Melodie[i][Note1_encours] += (12 * Etat_Octave[Etat_actuel]);
 
 ______________________________________________________________________________________
