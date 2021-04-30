@@ -20,13 +20,13 @@ const int renv_codeur_clock = 11;   // Codeur renversement - Clock sur pin 11
 const int renv_codeur_data = 12;    // Codeur renversement - Data sur pin 12
 const int renv_codeur_switch = 13;  // Codeur renversement - Switch sur pin 13
 
-const int MMSB_codeur_clock = A2;   // Codeur MidiExt MSB - Clock sur pin A2
-const int MMSB_codeur_data = A3;    // Codeur MidiExt MSB - Data sur pin A3
-const int MMSB_codeur_switch = A4;  // Codeur MidiExt MSB - Switch sur pin A4
+const int MMSB_codeur_clock = A0;   // Codeur MidiExt MSB - Clock sur pin A0
+const int MMSB_codeur_data = A1;    // Codeur MidiExt MSB - Data sur pin A1
+const int MMSB_codeur_switch = A2;  // Codeur MidiExt MSB - Switch sur pin A2
 
-const int MLSB_codeur_clock = A2;   // Codeur MidiExt LSB - Clock sur pin A2 On utilise le meme codeur pour MSB LSB
-const int MLSB_codeur_data = A3;    // Codeur MidiExt LSB - Data sur pin A3
-const int MLSB_codeur_switch = A4;  // Codeur MidiExt LSB - Switch sur pin A4
+const int MLSB_codeur_clock = A0;   // Codeur MidiExt LSB - Clock sur pin A0 On utilise le meme codeur pour MSB LSB
+const int MLSB_codeur_data = A1;    // Codeur MidiExt LSB - Data sur pin A1
+const int MLSB_codeur_switch = A2;  // Codeur MidiExt LSB - Switch sur pin A2
 
 const int insE_codeur_clock = 2;    // Codeur inst Midi Externe - Clock sur pin 2 On utilise le meme codeur Inst
 const int insE_codeur_data = 3;     // Codeur inst Midi Externe - Data sur pin 3
@@ -67,16 +67,17 @@ int Etat_SwitchInsE[2] =       {OFF, OFF};
 
 
 //Déclaration pour les multiplexeurs
-const int No_PinEtatMux1 = A7;    //Lecture Etat Mux 1
-const int No_PinEtatMux2 = A8;    //Lecture Etat Mux 2
-const int No_PinMuxAddr1 = A9;
-const int No_PinMuxAddr2 = A10;
-const int No_PinMuxAddr3 = A11;
+const int No_PinEtatMux1 = A9;    //Lecture Etat Mux 1
+const int No_PinEtatMux2 = A10;   //Lecture Etat Mux 2
+const int No_PinMuxAddr1 = A11;
+const int No_PinMuxAddr2 = A12;
+const int No_PinMuxAddr3 = A13;
 
 // A0 = Pin 54 --- A11 = Pin 65
 
-// tableau Etat Entrées MUX
-int Etat_Mux1[8] = {
+// tableau Etat Entrées MUX de 0 à 15
+// 0 à 7 Mux1, 8 à 15 Mux2
+int Etat_Mux[16] = {
   OFF,
   OFF,
   OFF,
@@ -84,10 +85,7 @@ int Etat_Mux1[8] = {
   OFF,
   OFF,
   OFF,
-  OFF
-};
-
-int Etat_Mux2[8] = {
+  OFF,
   OFF,
   OFF,
   OFF,
@@ -271,8 +269,8 @@ void Lecture_Mux() {
     digitalWrite(No_PinMuxAddr1, A1);
     digitalWrite(No_PinMuxAddr2, A2);
     digitalWrite(No_PinMuxAddr3, A3);
-    Etat_Mux1[Addr] = digitalRead(No_PinEtatMux1);
-    Etat_Mux2[Addr] = digitalRead(No_PinEtatMux2);
+    Etat_Mux[Addr] = digitalRead(No_PinEtatMux1);
+    Etat_Mux[Addr + 8] = digitalRead(No_PinEtatMux2);
   }
 }
 

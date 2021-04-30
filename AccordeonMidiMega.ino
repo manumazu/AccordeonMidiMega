@@ -4,12 +4,12 @@
 //#define ANALOGPEDALE  // si pas de capteur de force, remplacé par pédale volume analogique et bouton pousse-tire
 //#define CAPTEURFORCEHX711     // Capteur de force HX711
 #define CAPTEURPRESSIONBMP280  // Capteur de pression BMP280
-//#define CAPTEURPRESSIONHONEY  // Capteur de pression Honeywell
+//#define CAPTEURPRESSIONHONEY  // Capteur de pression Honeywell en analogique
 //Fin des define choix du capteur
 
 #define MIDIVELOCITY     // Application du calcul après lecture capteur/pédale sur la vélocity, sinon Midi CC # 7 sur les trois canaux
 
-const String Version = "Robert_20210403-1   ";
+const String Version = "Robert_20210430-1   ";
 
 #include "Def_AccordeonMidi.h"    //Définition externe des touches
 #include <LiquidCrystal_I2C.h>
@@ -121,11 +121,10 @@ void setup() {
   for (int i = 0; i < Nb_ToucheMelodie; i++) {
     pinMode(Touche_Melodie[i][No_Pin], INPUT_PULLUP);
   }
-  // Initialisation touche Midic Panic et autres touches
-  pinMode(No_PinPanic, INPUT_PULLUP);
-  pinMode(No_PinMidiInExt, INPUT_PULLUP);
-  pinMode(No_PinTierceOnOff, INPUT_PULLUP);
-  pinMode(No_PinBassesProf, INPUT_PULLUP);
+  // Initialisation touche Regsitre
+  pinMode(No_PinBasson, INPUT_PULLUP);
+  pinMode(No_PinFluteBasson, INPUT_PULLUP);
+  pinMode(No_PinFlute, INPUT_PULLUP);
 
   // deMute Ampli
   pinMode(No_PinMute, OUTPUT);
@@ -304,7 +303,7 @@ void loop() {
   }
 
   //Touche Panic
-  Etat_Panic[Etat_actuel] = digitalRead(No_PinPanic);
+  Etat_Panic[Etat_actuel] = Etat_Mux[No_PinMuxPanic];
   if (Etat_Panic[Etat_actuel] != Etat_Panic[Etat_avant]) {
 #if defined (DEBUG)
     AfficheDebug = "Change Panic ";
@@ -323,7 +322,7 @@ void loop() {
     }
   }
   //Touche MidiInExt
-  Etat_MidiInExt[Etat_actuel] = digitalRead(No_PinMidiInExt);
+  Etat_MidiInExt[Etat_actuel] = Etat_Mux[No_PinMuxMidiInExt];
   if (Etat_MidiInExt[Etat_actuel] != Etat_MidiInExt[Etat_avant]) {
 #if defined (DEBUG)
     AfficheDebug = "Change MidiInExt ";
@@ -587,7 +586,7 @@ void loop() {
     }
   }
   //Touche TierceOnOff
-  Etat_TierceOnOff[Etat_actuel] = digitalRead(No_PinTierceOnOff);
+  Etat_TierceOnOff[Etat_actuel] = Etat_Mux[No_PinMuxTierceOnOff];
   if (Etat_TierceOnOff[Etat_actuel] != Etat_TierceOnOff[Etat_avant]) {
 #if defined (DEBUG)
     AfficheDebug = "Change TierceOnOff ";
@@ -633,7 +632,7 @@ void loop() {
 
   }
   //Touche BassesProfondes
-  Etat_BassesProf[Etat_actuel] = digitalRead(No_PinBassesProf);
+  Etat_BassesProf[Etat_actuel] = Etat_Mux[No_PinMuxBassesProf];
   if (Etat_BassesProf[Etat_actuel] != Etat_BassesProf[Etat_avant]) {
 #if defined (DEBUG)
     AfficheDebug = "Change BassesProfondes ";
@@ -736,9 +735,9 @@ void loop() {
   Lecture_Mux();
 
   //Lecture des poussoirs Registre, le dernier gagne !
-  if (Etat_Mux1[PinMux1Basson] == ON) Etat_Registre[Etat_actuel] = RegistreBasson;           // Lecture poussoir Basson
-  if (Etat_Mux1[PinMux1FluteBasson] == ON) Etat_Registre[Etat_actuel] = RegistreFluteBasson; // Lecture poussoir FluteBasson
-  if (Etat_Mux2[PinMux2Flute] == ON) Etat_Registre[Etat_actuel] = RegistreFlute;             // Lecture poussoir Flute
+  if (digitalRead(No_PinBasson) == ON) Etat_Registre[Etat_actuel] = RegistreBasson;           // Lecture poussoir Basson
+  if (digitalRead(No_PinFluteBasson) == ON) Etat_Registre[Etat_actuel] = RegistreFluteBasson; // Lecture poussoir FluteBasson
+  if (digitalRead(No_PinFlute) == ON) Etat_Registre[Etat_actuel] = RegistreFlute;             // Lecture poussoir Flute
   if (Etat_Registre[Etat_actuel] != Etat_Registre[Etat_avant]) {
     //changement/ajout registre des notes Mélodie en cours
     for (int i = 0; i < Nb_ToucheMelodie; i++)
@@ -809,7 +808,7 @@ void loop() {
 
   //Lecture Etat touche Accord
   for (int i = 0; i < Nb_ToucheAccord; i++) {
-    Etat_Touche_Accord [i][Etat_actuel] = Etat_Mux1[Touche_Accord[i][No_Pin]]; // Lecture Touche)
+    Etat_Touche_Accord [i][Etat_actuel] = Etat_Mux[Touche_Accord[i][No_Pin]]; // Lecture Touche)
     if (Etat_Touche_Accord[i][Etat_actuel] != Etat_Touche_Accord[i][Etat_avant]) {
       if (Etat_Touche_Accord[i][Etat_actuel] == ON) {
         PousseTire = Etat_PousseTire[Etat_actuel] ? 1 : 2;
@@ -869,7 +868,7 @@ void loop() {
   }
   //Lecture Etat touche Basse
   for (int i = 0; i < Nb_ToucheBasses; i++) {
-    Etat_Touche_Basses [i][Etat_actuel] = Etat_Mux2[Touche_Basses[i][No_Pin]]; // Lecture Touche)
+    Etat_Touche_Basses [i][Etat_actuel] = Etat_Mux[Touche_Basses[i][No_Pin]]; // Lecture Touche)
     if (Etat_Touche_Basses[i][Etat_actuel] != Etat_Touche_Basses[i][Etat_avant]) {
       if (Etat_Touche_Basses[i][Etat_actuel] == ON) {
         PousseTire = Etat_PousseTire[Etat_actuel] ? 1 : 2;

@@ -1,8 +1,8 @@
 //Définition des valeurs du capteur pédale analogique et codage
 //Le pousse-tire est effectué par un bouton
 
-const int No_PinVolume = A14;     //Analogique pour volume
-const int No_PinPousseTire = A15; //Analogique pour pousse-tire
+const int No_PinVolume = A7;     //Analogique pour volume
+const int No_PinPousseTire = A8; //Analogique pour pousse-tire
 
 int Etat_Capteur[2];  //Pas de valeur initiale, la pédale va de 0 à n, 0 étant volume 0
 
@@ -147,7 +147,7 @@ void Init_CapteurSoufflet()
   pinMode(No_PinVolume, INPUT);            //Analogique pédale
   pinMode(No_PinPousseTire, INPUT_PULLUP); //Digital bouton
   lecture = analogRead(No_PinVolume);
-  lecture = lecture - lecture % 2; // on arrondi au module 2 pour limiter les variations
+  lecture = lecture - lecture % 5; // on arrondi au module x pour limiter les variations
 
 #if defined (DEBUGCAPTEUR)
   Serial.print("Lecture arrondi Pédale analogique ");
@@ -156,12 +156,12 @@ void Init_CapteurSoufflet()
 }
 void Lecture_CapteurSoufflet()
 {
-  int i, j, valeur, valeurcalc, delta_milli;
+  int i, valeur;
   int delta;
   unsigned long millisec;
 
   lecture = analogRead(No_PinVolume);
-  lecture = lecture - lecture % 2; // on arrondi au module 2 pour limiter les variations
+  lecture = lecture - lecture % 5; // on arrondi au module x pour limiter les variations
 
   Etat_Capteur[Etat_actuel] = lecture;
   if (Etat_Capteur[Etat_avant] != Etat_Capteur[Etat_actuel]) {

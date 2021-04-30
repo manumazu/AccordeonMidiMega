@@ -8,12 +8,11 @@
 //Les Touche mélodies sont en INPUT_PULLUP, HIGH = OFF, LOW = ON
 const int ON = LOW ;
 const int OFF = HIGH;
-
-const int No_PinMidiInExt = 19;
-const int No_PinPanic = 15;
-const int No_PinMute = A5;
-const int No_PinTierceOnOff = A0;
-const int No_PinBassesProf = A1;
+const int No_PinMuxTierceOnOff = 8;
+const int No_PinMuxBassesProf = 9;
+const int No_PinMuxMidiInExt = 10;
+const int No_PinMuxPanic = 11;
+const int No_PinMute = A14;
 
 const int No_Pin = 0;
 
@@ -39,43 +38,43 @@ int MidiVelocity = 64;           //Vélocité constante par défaut (1 à 127)
 */
 
 const int Touche_Melodie[Nb_ToucheMelodie][5] = {
-  {22, 50, 54, 62, 66},  // Touche mélodie 1 Rangée extérieure
-  {24, 55, 57, 67, 69},  // Touche mélodie 2
-  {26, 59, 60, 71, 72},  // Touche mélodie 3
-  {28, 62, 64, 74, 76},  // Touche mélodie 4
-  {30, 67, 66, 79, 78},  // Touche mélodie 5
-  {32, 71, 69, 83, 81},  // Touche mélodie 6
-  {34, 74, 72, 86, 84},  // Touche mélodie 7
-  {36, 79, 76, 91, 88},  // Touche mélodie 8
-  {38, 83, 78, 95, 90},  // Touche mélodie 9
-  {40, 86, 81, 98, 93},  // Touche mélodie 10
-  {42, 55, 59, 67, 71},  // Touche mélodie 11 Rangée du milieu
-  {44, 60, 62, 72, 74},  // Touche mélodie 12
-  {46, 64, 65, 76, 77},  // Touche mélodie 13
-  {48, 67, 69, 79, 81},  // Touche mélodie 14
-  {50, 72, 71, 84, 83},  // Touche mélodie 15
-  {52, 76, 74, 88, 86},  // Touche mélodie 16
-  {31, 79, 77, 91, 89},  // Touche mélodie 17
-  {33, 84, 81, 96, 93},  // Touche mélodie 18
-  {35, 88, 83, 100, 95}, // Touche mélodie 19
-  {37, 57, 61, 69, 73},  // Touche mélodie 20 Rangée intérieure
-  {39, 63, 67, 75, 79},  // Touche mélodie 21
-  {41, 68, 68, 80, 80},  // Touche mélodie 22
-  {43, 69, 70, 81, 82},  // Touche mélodie 23
-  {45, 75, 73, 87, 85},  // Touche mélodie 24
-  {47, 80, 79, 92, 91},  // Touche mélodie 25
-  {49, 81, 80, 93, 92},  // Touche mélodie 26
-  {51, 87, 82, 99, 94}   // Touche mélodie 27
+  {25, 50, 54, 62, 66},  // Touche mélodie m1  Rangée extérieure en haut
+  {26, 55, 57, 67, 69},  // Touche mélodie m2
+  {30, 59, 60, 71, 72},  // Touche mélodie m3
+  {32, 62, 64, 74, 76},  // Touche mélodie m4
+  {35, 67, 66, 79, 78},  // Touche mélodie m5
+  {37, 71, 69, 83, 81},  // Touche mélodie m6
+  {38, 74, 72, 86, 84},  // Touche mélodie m7
+  {43, 79, 76, 91, 88},  // Touche mélodie m8
+  {44, 83, 78, 95, 90},  // Touche mélodie m9
+  {49, 86, 81, 98, 93},  // Touche mélodie m10 Rangée extérieure en bas
+  {23, 55, 59, 67, 71},  // Touche mélodie m11 Rangée du milieu en haut
+  {24, 60, 62, 72, 74},  // Touche mélodie m12
+  {29, 64, 65, 76, 77},  // Touche mélodie m13
+  {33, 67, 69, 79, 81},  // Touche mélodie m14
+  {34, 72, 71, 84, 83},  // Touche mélodie m15
+  {39, 76, 74, 88, 86},  // Touche mélodie m16
+  {41, 79, 77, 91, 89},  // Touche mélodie m17
+  {45, 84, 81, 96, 93},  // Touche mélodie m18
+  {46, 88, 83, 100, 95}, // Touche mélodie m19 Rangée du milieu en bas
+  {22, 57, 61, 69, 73},  // Touche mélodie m20 Rangée intérieure en haut
+  {27, 63, 67, 75, 79},  // Touche mélodie m21
+  {28, 68, 68, 80, 80},  // Touche mélodie m22
+  {31, 69, 70, 81, 82},  // Touche mélodie m23
+  {36, 75, 73, 87, 85},  // Touche mélodie m24
+  {40, 80, 79, 92, 91},  // Touche mélodie m25
+  {42, 81, 80, 93, 92},  // Touche mélodie m26
+  {47, 87, 82, 99, 94}   // Touche mélodie m27 Rangée intérieure en bas
 };
 
 /*
   pour le clavier main gauche (basses et accord) - chaque touche fait jouer 3 notes en même temps,
   la tierce est supprimé suivant état du bouton TierceOnOff pour les accords
   le premier nombre = l'adresse de la touche sur les Mux
-  le deuxième nombre = le code midi en poussé pour la première note
-  le troisième nombre = le code midi en tiré pour la première note
-  le quatrième nombre = le code midi en poussé pour la deuxième note (la tierce)
-  le cinquième nombre = le code midi en tiré pour la deuxième note (la tierce)
+  le deuxième nombre = le code midi en poussé pour la première note (la basse profonde pour les basses)
+  le troisième nombre = le code midi en tiré pour la première note (la basse profonde pour les basses)
+  le quatrième nombre = le code midi en poussé pour la deuxième note (la tierce pour les accords)
+  le cinquième nombre = le code midi en tiré pour la deuxième note (la tierce pour les accords)
   le sixième nombre = le code midi en poussé pour la troisième note
   le septième nombre = le code midi en tiré pour la troisième note
   Les Touches basses/accord sont géré par les multiplexeurs, HIGH = Off, LOW = On */
@@ -84,12 +83,12 @@ const int Nb_ToucheAccord = 6;
 
 const int Touche_Accord[Nb_ToucheAccord][7] = {
 
-  {0, 80, 83, 84, 86, 87, 90}, // Touche accord 28
-  {1, 79, 74, 83, 77, 86, 81}, // Touche accord 30
-  {2, 72, 79, 76, 83, 79, 86}, // Touche accord 32
-  {3, 75, 82, 78, 86, 82, 89}, // Touche accord 34
-  {4, 76, 76, 79, 80, 83, 83}, // Touche accord 36
-  {5, 77, 77, 81, 81, 84, 84}, // Touche accord 38
+  {0, 80, 83, 84, 86, 87, 90},  // Touche accord a10 Rangée extérieure en haut
+  {13, 79, 74, 83, 77, 86, 81}, // Touche accord a2
+  {14, 72, 79, 76, 83, 79, 86}, // Touche accord a4  Rangée extérieure en bas
+  {3, 75, 82, 78, 86, 82, 89},  // Touche accord a12 Rangée intérieure en haut
+  {5, 76, 76, 79, 80, 83, 83},  // Touche accord a6
+  {7, 77, 77, 81, 81, 84, 84},  // Touche accord a8  Rangée intérieure en bas
 };
 
 const int NoteBassePousse = 1;
@@ -102,12 +101,12 @@ const int Nb_ToucheBasses = 6;
 
 const int Touche_Basses[Nb_ToucheBasses][7] = {
 
-  {0, 56, 59, 68, 71, 80, 83}, // Touche basses 29
-  {1, 55, 50, 67, 62, 79, 74}, // Touche basses 31
-  {2, 48, 55, 60, 67, 72, 79}, // Touche basses 33
-  {3, 51, 58, 63, 70, 75, 82}, // Touche basses 35
-  {4, 52, 57, 64, 69, 76, 81}, // Touche basses 37
-  {5, 53, 53, 65, 65, 77, 77} // Touche basses 39
+  {1, 56, 59, 68, 71, 80, 83},  // Touche basses b9 Rangée extérieure en haut
+  {12, 55, 50, 67, 62, 79, 74}, // Touche basses b1
+  {15, 48, 55, 60, 67, 72, 79}, // Touche basses b3 Rangée extérieure en bas
+  {2, 51, 58, 63, 70, 75, 82},  // Touche basses b11 Rangée intérieure en haut
+  {4, 52, 57, 64, 69, 76, 81},  // Touche basses b5
+  {6, 53, 53, 65, 65, 77, 77}   // Touche basses b7 Rangée intérieure en bas
 };
 
 // A0 = Pin 54 --- A11 = Pin 65
@@ -135,9 +134,9 @@ int Etat_InstrumentE[2] =  {InstrumentExtDef, 0}; // valeur entre 0 et 127
 int Etat_Registre[2] =  {0, 0};            // valeur 0 Basson, 1 Flüte+Basson, 2 Flûte
 int Etat_Volume_Midi[2] =     {0, 0};            // Valeur Midi calculé du Volume
 unsigned long Etat_Volume_Millis[2] =     {0, 0};// Valeur Milliseconde au moment de la lecture
-int PinMux1Basson = 6;
-int PinMux1FluteBasson = 7;
-int PinMux2Flute = 6;
+int No_PinBasson = 49;
+int No_PinFluteBasson = 51;
+int No_PinFlute = 53;
 int RegistreBasson = 0;
 int RegistreFluteBasson = 1;
 int RegistreFlute = 2;

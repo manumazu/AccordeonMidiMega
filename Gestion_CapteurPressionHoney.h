@@ -1,4 +1,4 @@
-//Définition des valeurs du capteur de pression Honeywell et codage
+//Définition des valeurs du capteur de pression Honeywell en analogique et codage
 
 const int No_PinHoney1 = A5;  //Analogique pour capteur Honeywell 1
 const int No_PinHoney2 = A6;  //Analogique pour capteur Honeywell 2

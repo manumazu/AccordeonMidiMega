@@ -1,13 +1,13 @@
 //Définition des valeurs du capteur de force HX711 et codage
 
-int Etat_Capteur[2];        //Conversion valeur float du capteur en int
-int Etat_ReferenceCapteur;  //valeur du capteur au setup
+long Etat_Capteur[2];        //Conversion valeur float du capteur en long
+long Etat_ReferenceCapteur;  //valeur du capteur au setup
 
 #include "HX711.h"
 
 #define calibration_factor -7050.0
-#define No_Pin_HX711_Data  A12
-#define No_Pin_HX711_Clock  A13
+#define No_Pin_HX711_Data  A3
+#define No_Pin_HX711_Clock  A4
 
 HX711 scale;
 
@@ -283,7 +283,7 @@ void Init_CapteurSoufflet()
   scale.tare();  //On laisse Robert tranquille à l'allumage !
 
   lecture = scale.get_units();      //scale.get_units() returns a float
-  Etat_ReferenceCapteur = Etat_Capteur[Etat_actuel] = lecture;  //conversion en int
+  Etat_ReferenceCapteur = Etat_Capteur[Etat_actuel] = lecture;  //conversion en long
 
 #if defined (DEBUGCAPTEUR)
   Serial.print("Lecture Capteur Force HX711 ");

@@ -11,6 +11,7 @@ long Etat_ReferenceCapteur;  //valeur du capteur au setup
 Adafruit_BMP280 bmp; // I2C
 
 float lecture;
+long lecturelong;
 
 const int Const_Volume_Valeur_Capteur = 0;
 const int Const_Volume_Valeur_Midi = 1;
@@ -294,7 +295,7 @@ void Init_CapteurSoufflet()
                   Adafruit_BMP280::FILTER_X16,      /* Filtering. */
                   Adafruit_BMP280::STANDBY_MS_1);   /* Standby time. 1 ms */
 
-  lecture = bmp.readPressure();    //conversion float en int
+  lecture = bmp.readPressure();
   Etat_ReferenceCapteur = lecture;
 
 #if defined (DEBUGCAPTEUR)
@@ -312,8 +313,9 @@ void Lecture_CapteurSoufflet()
   unsigned long millisec;
 
   lecture = bmp.readPressure();      //bmp.readPressure() returns a float
-
-  Etat_Capteur[Etat_actuel] = lecture;  //conversion en int
+  lecturelong = lecture;             //conversion en long
+  lecturelong = lecturelong - lecturelong % 10; // on arrondi au module x pour limiter les variations
+  Etat_Capteur[Etat_actuel] = lecturelong;
   if (Etat_Capteur[Etat_avant] != Etat_Capteur[Etat_actuel]) {
     millisec = millis();
     Etat_Volume_Millis[Etat_actuel] = millisec;
@@ -373,7 +375,6 @@ void Lecture_CapteurSoufflet()
   else
     Affiche = "";
   Affiche += lecture;
-  Affiche += " Pa";
   for (i = Affiche.length(); i < 11; i++)
     Affiche += " ";  // On remplit à blanc
   lcd.print(Affiche);

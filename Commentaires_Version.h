@@ -1,5 +1,9 @@
 Version à changer dans AccordeonMidiMega.ino à chaque versement sur GitHub !
 
+Version "Robert_20210430-1   "
+Fusion des tableaux de pins Mux pour ne plus associer par codage les pins Accords au Mux1 et les Basses au Mux2
+Mise à jour des pins en préparation des connections des circuits imprimés Mux, basses/accord et Mélodie
+
 Version "Robert_20210403-1   "
 Codage pour gestion capteur de force HX711, pression BM280, pression Honeywell ou pédale analogique+bouton pousse-tire avec un .h par type de capteur
 Remplissage du tableau Const_Volume_Capteur à partir d'une feuille Excel
