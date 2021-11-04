@@ -26,7 +26,22 @@ const byte ChannelAccord = 2;     // Channel pour les touches Mélodies
 const int Midi_Interne = OFF;     //Etat initial du bouton Midi Interne/Externe sur Interne au repos
 const int Midi_Int = 0;
 const int Midi_Ext = 1;
-int MidiVelocity = 64;           //Vélocité constante par défaut (1 à 127)
+const int Defaut_Midi_Volume = 120;
+const int Defaut_Midi_Expression = 80;
+const int Defaut_Midi_Velocity = 64;
+int MidiVelocity = Defaut_Midi_Velocity;        //Vélocité constante par défaut (1 à 127)
+// Si MIDIEXT_EXPRESSION
+int MidiExtVelocity = Defaut_Midi_Expression;   //Vélocité Ext constante par défaut (1 à 127)
+int MidiExtVolume = Defaut_Midi_Volume;         //Volume Ext constante par défaut (1 à 127)
+// Si TSUNAMI_SERIALCONTROL
+const int Defaut_Tsu_Gain = 0;                  //Gain Tsunami par défaut (-70 à +4)
+
+int Volume_EnCours_Midi;
+int Expression_EnCours_Midi;
+int Gain_EnCours_Tsunami;
+const int Const_Volume_VarMax_Midi = 10;
+const int Const_Expression_VarMax_Midi = 5;
+const int Const_Gain_VarMax_Tsunami = 2;
 
 /*
   Association des codes MIDI pour le clavier main droite (mélodie)
@@ -132,11 +147,13 @@ int Etat_MidiMSB[2] =      {0, 0};         // Midi Bank MSB valeur entre 0 et 12
 int Etat_MidiLSB[2] =      {0, 0};         // Midi Bank LSBvaleur entre 0 et 127
 int Etat_InstrumentE[2] =  {InstrumentExtDef, 0}; // valeur entre 0 et 127
 int Etat_Registre[2] =  {0, 0};            // valeur 0 Basson, 1 Flüte+Basson, 2 Flûte
-int Etat_Volume_Midi[2] =     {0, 0};            // Valeur Midi calculé du Volume
+int Etat_Volume_Midi[2] = {0, 0};          // Valeur Midi calculé du Volume
+int Etat_Expression_Midi[2] = {0, 0};      // Valeur Midi calculé de l'Expression pour Midi Ext
+int Etat_Gain_Tsunami[2] = {0, 0};         // Valeur Tsunami calculé du Gain
 unsigned long Etat_Volume_Millis[2] =     {0, 0};// Valeur Milliseconde au moment de la lecture
-int No_PinBasson = 49;
-int No_PinFluteBasson = 51;
-int No_PinFlute = 53;
+int No_PinBasson = 48;
+int No_PinFluteBasson = 52;
+int No_PinFlute = 50;
 int RegistreBasson = 0;
 int RegistreFluteBasson = 1;
 int RegistreFlute = 2;

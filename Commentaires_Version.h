@@ -1,11 +1,21 @@
 Version à changer dans AccordeonMidiMega.ino à chaque versement sur GitHub !
 
+Version "Robert_20211104-1   "
+Suppression de l'affichage LCD en temps réel du volume qui génére de la latence
+Lissage du Volume / Expression
+Inversion sens du poussetire
+Pousse - tire en fonction de la valeur de référence du capteur au démarrage
+Gestion de la tolérance sur la lecture du capteur
+Gestion du Control Code Expression sur Midi Ext, velocity et volume avec valeur par défaut
+Gestion du volume Tsunami par port série Serial3
+Gestion optionnel du capteur MPX10DP en HX711 sur Channel B
+
 Version "Robert_20210430-1   "
 Fusion des tableaux de pins Mux pour ne plus associer par codage les pins Accords au Mux1 et les Basses au Mux2
-Mise à jour des pins en préparation des connections des circuits imprimés Mux, basses/accord et Mélodie
+Mise à jour des pins en préparation des connections des circuits imprimés Mux, basses / accord et Mélodie
 
 Version "Robert_20210403-1   "
-Codage pour gestion capteur de force HX711, pression BM280, pression Honeywell ou pédale analogique+bouton pousse-tire avec un .h par type de capteur
+Codage pour gestion capteur de force HX711, pression BM280, pression Honeywell ou pédale analogique + bouton pousse - tire avec un .h par type de capteur
 Remplissage du tableau Const_Volume_Capteur à partir d'une feuille Excel
 Nettoyage de noms de variables et création de noteOff
 Affichage du volume/vélocité sur LCD ligne 2

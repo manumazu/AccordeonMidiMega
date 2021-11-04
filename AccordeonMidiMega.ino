@@ -1,15 +1,20 @@
 #define DEBUG          // si Debug sur Moniteur série standard
-#define DEBUGCAPTEUR   // si Debug capteur sur Moniteur série standard et écran LCD
+#define DEBUGCAPTEUR   // si Debug capteur sur Moniteur série standard
+//#define DEBUGCAPTLCD   // si Debug capteur sur écran LCD
+//#define DEBUGTSUGAIN   // si Debug gain tsunami sur Moniteur série standard
 // Choix du capteur : un seul define parmi les x suivants
-//#define ANALOGPEDALE  // si pas de capteur de force, remplacé par pédale volume analogique et bouton pousse-tire
-//#define CAPTEURFORCEHX711     // Capteur de force HX711
-#define CAPTEURPRESSIONBMP280  // Capteur de pression BMP280
-//#define CAPTEURPRESSIONHONEY  // Capteur de pression Honeywell en analogique
+//#define ANALOGPEDALE                // si pas de capteur de force, remplacé par pédale volume analogique et bouton pousse-tire
+//#define CAPTEURFORCEHX711           // Capteur de force HX711
+//#define CAPTEURPRESSIONBMP280       // Capteur de pression BMP280
+//#define CAPTEURPRESSIONHONEYHX711   // Capteur de pression Honeywell HX711
+#define CAPTEURPRESSIONMPX10DPHX711 // Capteur de pression MPX10DP HX711
 //Fin des define choix du capteur
 
-#define MIDIVELOCITY     // Application du calcul après lecture capteur/pédale sur la vélocity, sinon Midi CC # 7 sur les trois canaux
+//#define MIDIVELOCITY     // Application du calcul après lecture capteur/pédale sur la vélocity, sinon Midi CC # 7 sur les trois canaux
+#define MIDIEXT_EXPRESSION     // Envoi du control Expression avec valeur calculé sur le Midi ext avec velocity fixe
+#define TSUNAMI_SERIALCONTROL     // Envoi du volume par le port série de la Tsunami
 
-const String Version = "Robert_20210430-1   ";
+const String Version = "Robert_20211104-1   ";
 
 #include "Def_AccordeonMidi.h"    //Définition externe des touches
 #include <LiquidCrystal_I2C.h>
@@ -19,6 +24,11 @@ String Affiche;
 #if defined (DEBUG)
 String AfficheDebug;
 #endif
+
+//Changer le define __TSUNAMI_USE_SERIAL1__ en __TSUNAMI_USE_SERIAL3__ dans Tsunami.h
+#include <Tsunami.h>
+Tsunami tsunami;                // Objet Tsunami
+char gTsunamiVersion[VERSION_STRING_LEN];    // Tsunami version string
 
 #include "Libelle_Midi.h"
 #include "Gestion_Codeur_Mux.h"
@@ -32,11 +42,14 @@ String AfficheDebug;
 #if defined (CAPTEURPRESSIONBMP280)
 #include "Gestion_CapteurPressionBMP280.h"
 #endif
-#if defined (CAPTEURPRESSIONHONEY)
-#include "Gestion_CapteurPressionHoney.h"
+#if defined (CAPTEURPRESSIONHONEYHX711)
+#include "Gestion_CapteurPressionHoneyHX711.h"
+#endif
+#if defined (CAPTEURPRESSIONMPX10DPHX711)
+#include "Gestion_CapteurPressionMPX10DPHX711.h"
 #endif
 
-//Affichage de la ligne 1 ou 2 sur l'afficheur LCD
+//Affichage de la ligne 1 à 4 sur l'afficheur LCD
 void Affiche_LCD(int ligne) {
   int i;
 
@@ -61,12 +74,6 @@ void Affiche_LCD(int ligne) {
     case 2: // Tonalité
       Affiche = Libelle_Tona[6 + Etat_Tona[Etat_actuel]];
       lcd.setCursor(0, 1);
-      lcd.print(Affiche);
-      Affiche = "V ";
-      Affiche += Etat_Volume_Midi[Etat_actuel];
-      for (i = Affiche.length(); i < 5; i++)
-        Affiche += " ";  // On remplit à blanc
-      lcd.setCursor(14, 1);
       lcd.print(Affiche);
       break;
     case 3 :  // Octave - Renversement - Registre
@@ -100,14 +107,7 @@ void Affiche_LCD(int ligne) {
 }
 // the setup function runs once when you press reset or power the board
 void setup() {
-
-  lcd.init();                      // initialize the lcd
-  delay(100);
-  lcd.begin(20, 4);
-  lcd.backlight();
-  lcd.clear();
-  lcd.print(Version); //Affiche la version
-  delay(4000);
+  int nbtracks;
 
 #if defined (DEBUG)
   Serial.begin (9600);    //pour le debug écran PC 9600
@@ -116,6 +116,73 @@ void setup() {
   }
   Serial.println("Debug");
 #endif
+
+  lcd.init();                      // initialize the lcd
+  delay(100);
+  lcd.begin(20, 4);
+  lcd.backlight();
+  lcd.clear();
+  lcd.print(Version); //Affiche la version
+  // Attente pour laisser le temps du reste à la Tsunami avnt l'envoi de commandes
+  delay(1000);
+  // Tsunami startup at 57600
+  tsunami.start();
+  delay(10);
+  // On arrete les sons en cours si il y a eu un reset de Mega seul
+  tsunami.stopAllTracks();
+  delay(100);
+  nbtracks = tsunami.getNumTracks();
+#if defined (DEBUG)
+  if (tsunami.getVersion(gTsunamiVersion, VERSION_STRING_LEN))
+    Serial.println(gTsunamiVersion);
+  Serial.print(nbtracks);
+  Serial.println(" tracks sur SD");
+#endif
+  lcd.setCursor(0, 1);
+  lcd.print(nbtracks);
+  lcd.print(" tracks sur SD");
+#if defined (ANALOGPEDALE)
+  Affiche = "Pedale Ana";
+#endif
+#if defined (CAPTEURFORCEHX711)
+  Affiche = "Force HX711";
+#endif
+#if defined (CAPTEURPRESSIONBMP280)
+  Affiche = "Press BMP280";
+#endif
+#if defined (CAPTEURPRESSIONHONEYANA)
+  Affiche = "Press Honey Ana";
+#endif
+#if defined (CAPTEURPRESSIONHONEYHX711)
+  Affiche = "Press Honey HX711";
+#endif
+#if defined (CAPTEURPRESSIONMPX10DPANA)
+  Affiche = "Press MPX10DP Ana";
+#endif
+#if defined (CAPTEURPRESSIONMPX10DPHX711)
+  Affiche = "Press MPX10DP HX711";
+#endif
+  lcd.setCursor(0, 2);
+  lcd.print(Affiche);
+#if defined (DEBUG)
+  Serial.println(Affiche);
+#endif
+  Affiche = "";
+#if defined (MIDIVELOCITY)
+  Affiche += "MidiVel ";
+#endif
+#if defined (MIDIEXT_EXPRESSION)
+  Affiche += "MidiExp ";
+#endif
+#if defined (TSUNAMI_SERIALCONTROL)
+  Affiche += "TsuG";
+#endif
+  lcd.setCursor(0, 3);
+  lcd.print(Affiche);
+#if defined (DEBUG)
+  Serial.println(Affiche);
+#endif
+  delay(4000);
 
   // initialisation pin digital du tableau de Touches Mélodie en INPUT_PULLUP
   for (int i = 0; i < Nb_ToucheMelodie; i++) {
@@ -135,20 +202,17 @@ void setup() {
 
   // Initialisation des multiplexeurs Basses,Accord et spare
   Init_Mux();
-
   // Initialisation du capteur de soufflet
   Etat_Volume_Millis[Etat_actuel] = Etat_Volume_Millis[Etat_avant] = millis();
   Init_CapteurSoufflet();
 
   //Init fonctions Midi
   InitMidi();
-#if defined (MIDIVELOCITY)
-  MidiVelocity = 0;
-#else
-  Volume(ChannelMelodie, Etat_Volume_Midi[Etat_actuel]);
-  Volume(ChannelBasses, Etat_Volume_Midi[Etat_actuel]);
-  Volume(ChannelAccord, Etat_Volume_Midi[Etat_actuel]);
-#endif
+  Volume_EnCours_Midi = Etat_Volume_Midi[Etat_actuel];
+  Expression_EnCours_Midi = Etat_Expression_Midi[Etat_actuel];
+  Gain_EnCours_Tsunami = Etat_Gain_Tsunami[Etat_actuel];
+  VolumeGen();
+  lcd.clear();
   Affiche_LCD(1);
   Affiche_LCD(2);
   Affiche_LCD(3);
@@ -339,7 +403,7 @@ void loop() {
   Etat_PousseTire[Etat_actuel] = digitalRead(No_PinPousseTire);
 #else
   if (Etat_Capteur[Etat_actuel] != Etat_Capteur[Etat_avant]) {  // Test valeur capteur pour le pousse tire
-    if (Etat_Capteur[Etat_actuel] >= Etat_Capteur[Etat_avant]) Etat_PousseTire[Etat_actuel] = ON;
+    if (Etat_Capteur[Etat_actuel] < Etat_ReferenceCapteur) Etat_PousseTire[Etat_actuel] = ON;
     else Etat_PousseTire[Etat_actuel] = OFF;
   }
 #endif
@@ -351,23 +415,17 @@ void loop() {
     AfficheDebug += Etat_Volume_Midi[Etat_actuel];
     Serial.println(AfficheDebug);
 #endif
-#if defined (MIDIVELOCITY)
-    MidiVelocity = Etat_Volume_Midi[Etat_actuel];
-#else
-    Volume(ChannelMelodie, Etat_Volume_Midi[Etat_actuel]);
-    Volume(ChannelBasses, Etat_Volume_Midi[Etat_actuel]);
-    Volume(ChannelAccord, Etat_Volume_Midi[Etat_actuel]);
-#endif
+    VolumeGen();
   }
   Etat_Capteur[Etat_avant] = Etat_Capteur[Etat_actuel];
   Etat_Volume_Midi[Etat_avant] = Etat_Volume_Midi[Etat_actuel];
   Etat_Volume_Millis[Etat_avant] = Etat_Volume_Millis[Etat_actuel];
-  Affiche_LCD(2);
 
   if (Etat_PousseTire[Etat_actuel] != Etat_PousseTire[Etat_avant]) {
     Etat_PousseTire[Etat_avant] = Etat_PousseTire[Etat_actuel];
 #if defined (DEBUG)
-    AfficheDebug = "Change PousseTire ";
+    AfficheDebug = millis();
+    AfficheDebug += "Change PousseTire ";
     AfficheDebug += Etat_PousseTire[Etat_actuel] ? "OFF" : "ON";
     Serial.println(AfficheDebug);
 #endif
@@ -397,6 +455,8 @@ void loop() {
           AfficheDebug += Etat_Touche_Melodie[i][Note1_encours];
           AfficheDebug +=  " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
           Serial.println(AfficheDebug);
 #endif
         }
@@ -422,6 +482,8 @@ void loop() {
           AfficheDebug += Etat_Touche_Melodie[i][Note2_encours];
           AfficheDebug +=  " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
           Serial.println(AfficheDebug);
 #endif
         }
@@ -453,6 +515,8 @@ void loop() {
           AfficheDebug += Etat_Touche_Basses[i][Note1_encours];
           AfficheDebug +=  " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
           Serial.println(AfficheDebug);
 #endif
         }
@@ -478,6 +542,8 @@ void loop() {
         AfficheDebug += Etat_Touche_Basses[i][Note2_encours];
         AfficheDebug +=  " ON Velo ";
         AfficheDebug += MidiVelocity;
+        AfficheDebug +=  " Gain ";
+        AfficheDebug += Gain_EnCours_Tsunami;
         Serial.println(AfficheDebug);
 #endif
         noteOff(ChannelBasses, Etat_Touche_Basses[i][Note3_encours]);
@@ -502,6 +568,8 @@ void loop() {
         AfficheDebug += Etat_Touche_Basses[i][Note3_encours];
         AfficheDebug +=  " ON Velo ";
         AfficheDebug += MidiVelocity;
+        AfficheDebug +=  " Gain ";
+        AfficheDebug += Gain_EnCours_Tsunami;
         Serial.println(AfficheDebug);
 #endif
       }
@@ -531,6 +599,8 @@ void loop() {
         AfficheDebug += Etat_Touche_Accord[i][Note1_encours];
         AfficheDebug +=  " ON Velo ";
         AfficheDebug += MidiVelocity;
+        AfficheDebug +=  " Gain ";
+        AfficheDebug += Gain_EnCours_Tsunami;
         Serial.println(AfficheDebug);
 #endif
         if (Etat_TierceOnOff[Etat_actuel] == ON) {
@@ -555,6 +625,8 @@ void loop() {
           AfficheDebug += Etat_Touche_Accord[i][Note2_encours];
           AfficheDebug +=  " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
           Serial.println(AfficheDebug);
 #endif
         }
@@ -580,11 +652,16 @@ void loop() {
         AfficheDebug += Etat_Touche_Accord[i][Note3_encours];
         AfficheDebug +=  " ON Velo ";
         AfficheDebug += MidiVelocity;
+        AfficheDebug +=  " Gain ";
+        AfficheDebug += Gain_EnCours_Tsunami;
         Serial.println(AfficheDebug);
 #endif
       }
     }
   }
+  //Nouveau
+  VolumeGen();
+
   //Touche TierceOnOff
   Etat_TierceOnOff[Etat_actuel] = Etat_Mux[No_PinMuxTierceOnOff];
   if (Etat_TierceOnOff[Etat_actuel] != Etat_TierceOnOff[Etat_avant]) {
@@ -626,6 +703,8 @@ void loop() {
           AfficheDebug += Etat_Touche_Accord[i][Note2_encours];
           AfficheDebug +=  " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
           Serial.println(AfficheDebug);
 #endif
         }
@@ -670,6 +749,8 @@ void loop() {
           AfficheDebug += Etat_Touche_Basses[i][Note1_encours];
           AfficheDebug +=  " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
           Serial.println(AfficheDebug);
 #endif
         }
@@ -713,6 +794,8 @@ void loop() {
         if (Etat_Touche_Melodie[i][Etat_actuel] == ON) {
           AfficheDebug += " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
         }
         Serial.println(AfficheDebug);
       }
@@ -724,6 +807,8 @@ void loop() {
         if (Etat_Touche_Melodie[i][Etat_actuel] == ON) {
           AfficheDebug += " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
         }
         else AfficheDebug += " OFF  ";
         Serial.println(AfficheDebug);
@@ -777,6 +862,8 @@ void loop() {
           AfficheDebug += Etat_Touche_Melodie[i][Note1_encours];
           AfficheDebug +=  " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
           Serial.println(AfficheDebug);
 #endif
         }
@@ -793,6 +880,8 @@ void loop() {
           AfficheDebug += Etat_Touche_Melodie[i][Note2_encours];
           AfficheDebug +=  " ON Velo ";
           AfficheDebug += MidiVelocity;
+          AfficheDebug +=  " Gain ";
+          AfficheDebug += Gain_EnCours_Tsunami;
           Serial.println(AfficheDebug);
 #endif
         }

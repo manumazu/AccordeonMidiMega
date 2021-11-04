@@ -53,13 +53,31 @@ void InitMidi() {
   Instrument(ChannelMelodie, InstrumentExtDef, Midi_Ext);
   Instrument(ChannelBasses, InstrumentExtDef, Midi_Ext);
   Instrument(ChannelAccord, InstrumentExtDef, Midi_Ext);
+#if defined (MIDIEXT_EXPRESSION)
+  // Midi Externe
+  Serial2.write(0xB0 | ChannelMelodie);
+  Serial2.write(0x07);    //CC volume
+  Serial2.write(MidiExtVolume);    //Volume
+  Serial2.write(0xB0 | ChannelBasses);
+  Serial2.write(0x07);    //CC volume
+  Serial2.write(MidiExtVolume);    //Volume
+  Serial2.write(0xB0 | ChannelAccord);
+  Serial2.write(0x07);    //CC volume
+  Serial2.write(MidiExtVolume);    //Volume
+#endif
 }
 
 void noteOn(byte channel, int pitch, int velocity) {
+#if defined (TSUNAMI_SERIALCONTROL)
+  velocity = Defaut_Midi_Velocity;
+#endif
   // Midi Interne vers Tsunami
   Serial1.write(0X90 | channel);
   Serial1.write(pitch);
   Serial1.write(velocity);
+#if defined (MIDIEXT_EXPRESSION)
+  velocity = MidiExtVelocity;
+#endif
   // Midi Externe
   Serial2.write(0X90 | channel);
   Serial2.write(pitch);
@@ -68,11 +86,11 @@ void noteOn(byte channel, int pitch, int velocity) {
 void noteOff(byte channel, int pitch) {
   // pour noteOff on mets 0 dans velocity
   // Midi Interne vers Tsunami
-  Serial1.write(0X90 | channel);
+  Serial1.write(0X80 | channel);
   Serial1.write(pitch);
   Serial1.write(0x00);
   // Midi Externe
-  Serial2.write(0X90 | channel);
+  Serial2.write(0X80 | channel);
   Serial2.write(pitch);
   Serial2.write(0x00);
 }
@@ -82,8 +100,74 @@ void Volume(byte channel, int volume) {
   Serial1.write(0xB0 | channel);
   Serial1.write(0x07);    //CC volume
   Serial1.write(volume);    //Volume
+#if !defined (MIDIEXT_EXPRESSION)
   // Midi Externe
   Serial2.write(0xB0 | channel);
   Serial2.write(0x07);    //CC volume
   Serial2.write(volume);    //Volume
+#endif
+}
+// cc expression pour simuler l'action du soufflet sur toutes les notes jouées et/ou en cours de jeu sur le Midi Ext
+void ExpressionExt(byte channel, int expression) {
+  // Uniquement Midi Externe, Tsunami ne supporte le CC Expression
+  Serial2.write(0xB0 | channel);
+  Serial2.write(0x0B);    //CC expression
+  Serial2.write(expression);    //Volume
+}
+// Volume général lissé par valeur max de changement
+void VolumeGen() {
+
+#if defined (MIDIVELOCITY)
+  MidiVelocity = Etat_Volume_Midi[Etat_actuel];
+  /*
+    #else  //A reprendre
+    Volume(ChannelMelodie, Etat_Volume_Midi[Etat_actuel]);
+    Volume(ChannelBasses, Etat_Volume_Midi[Etat_actuel]);
+    Volume(ChannelAccord, Etat_Volume_Midi[Etat_actuel]);
+  */
+#endif
+#if defined (TSUNAMI_SERIALCONTROL)
+  if (Gain_EnCours_Tsunami != Etat_Gain_Tsunami[Etat_actuel]) {
+    if (Gain_EnCours_Tsunami > Etat_Gain_Tsunami[Etat_actuel]) {
+      if (Gain_EnCours_Tsunami - Etat_Gain_Tsunami[Etat_actuel] > Const_Gain_VarMax_Tsunami)
+        Gain_EnCours_Tsunami -=  Const_Gain_VarMax_Tsunami;
+      else
+        Gain_EnCours_Tsunami =  Etat_Gain_Tsunami[Etat_actuel];
+    }
+    else if (Etat_Gain_Tsunami[Etat_actuel] - Gain_EnCours_Tsunami > Const_Gain_VarMax_Tsunami)
+      Gain_EnCours_Tsunami +=  Const_Gain_VarMax_Tsunami;
+    else
+      Gain_EnCours_Tsunami =  Etat_Gain_Tsunami[Etat_actuel];
+
+    tsunami.masterGain(0, Gain_EnCours_Tsunami);
+    tsunami.masterGain(1, Gain_EnCours_Tsunami);
+    tsunami.masterGain(2, Gain_EnCours_Tsunami);
+#if defined (DEBUGTSUGAIN)
+    AfficheDebug = millis();
+    AfficheDebug += "\tAppel Tsunami GainEnCours ";
+    AfficheDebug += Gain_EnCours_Tsunami;
+    AfficheDebug += "\tGain actuel  ";
+    AfficheDebug += Etat_Gain_Tsunami[Etat_actuel];
+    Serial.println(AfficheDebug);
+#endif
+  }
+#endif
+#if defined (MIDIEXT_EXPRESSION)
+  if (Expression_EnCours_Midi != Etat_Expression_Midi[Etat_actuel]) {
+    if (Expression_EnCours_Midi > Etat_Expression_Midi[Etat_actuel]) {
+      if (Expression_EnCours_Midi - Etat_Expression_Midi[Etat_actuel] > Const_Expression_VarMax_Midi)
+        Expression_EnCours_Midi -=  Const_Expression_VarMax_Midi;
+      else
+        Expression_EnCours_Midi =  Etat_Expression_Midi[Etat_actuel];
+    }
+    else if (Etat_Expression_Midi[Etat_actuel] - Expression_EnCours_Midi > Const_Expression_VarMax_Midi)
+      Expression_EnCours_Midi +=  Const_Expression_VarMax_Midi;
+    else
+      Expression_EnCours_Midi =  Etat_Expression_Midi[Etat_actuel];
+
+    ExpressionExt(ChannelMelodie, Expression_EnCours_Midi);
+    ExpressionExt(ChannelBasses, Expression_EnCours_Midi);
+    ExpressionExt(ChannelAccord, Expression_EnCours_Midi);
+  }
+#endif
 }

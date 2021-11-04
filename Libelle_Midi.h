@@ -1,8 +1,8 @@
 //Libellés Instruments MIDI
 //
 const int Nb_Libelle_Midi_Interne = 11;
-//            Interne            Externe
-const String Libelle_Instr_Midi1[128] = {
+
+const String Libelle_Instr_Midi1[Nb_Libelle_Midi_Interne] = {
   {"Accordeon chromatic "},
   {"Banjo               "},
   {"Clarinette          "},

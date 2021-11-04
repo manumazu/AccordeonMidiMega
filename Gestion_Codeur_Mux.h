@@ -1,4 +1,4 @@
-// CODE POUR ACCORDEON DIATONIQUE MIDI
+//     CODE POUR ACCORDEON DIATONIQUE MIDI
 
 // Raccordement des codeurs rotatifs
 
